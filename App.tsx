@@ -1,8 +1,9 @@
-import React from "react";
-import HomeScreen from "./src/FE/screens/HomeScreen";
-import Login from "./src/FE/screens/Login";
+import * as React from "react";
+import 'react-native-gesture-handler';
 
+import Introduce from "./src/FE/screens/Introduce";
+import Signup from "./src/FE/screens/Signup";
 
 export default function App() {
-	return <Login/>;
+	return <Signup />;
 }
