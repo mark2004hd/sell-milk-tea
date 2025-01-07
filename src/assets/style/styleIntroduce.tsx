@@ -4,34 +4,35 @@ const styleIntroduce = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#ab9377",
 	},
-	scollView: {
-		flex: 1,
-		backgroundColor: "#ceae66",
-		paddingTop: 77,
-	},
+
 	img: {
-		flex: 1,
+		
 		width: 327,
-		marginHorizontal: 47,
+		marginLeft:35,
 		height: 425,
 		color: "#ceae66",
 		resizeMode: "contain",
-		marginVertical: 43,
+	    marginTop:"20%",
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 5,
+		
 	},
+
 	Header: {
+		paddingTop:50,
 		fontSize: 40,
 		fontWeight: "bold",
 		color: "#fff",
-		marginLeft: "23%",
+		marginLeft: "27%",
+		marginBottom:"4%"
 	},
 	Text1: {
 		color: "#594329",
 		fontSize: 16,
-		marginHorizontal: 126,
+	    marginLeft:"35%"
+		
 	},
 	coffe: {
 		borderRadius: 22,

@@ -1,11 +1,29 @@
+import { NavigationContainer } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import React from "react";
-import { Image, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, SafeAreaView, StatusBar, Text, TouchableOpacity, View } from "react-native";
 import styleIntroduce from "../style/styleIntroduce";
 
 const Introduce = () => {
+	// Tải font
+	const [fontsLoaded] = useFonts({
+		Outfit: require("../components/font/Outfit-VariableFont_wght.ttf"),
+	});
+
+	// Kiểm tra nếu font chưa được tải
+	if (!fontsLoaded) {
+		return (
+			<SafeAreaView style={styleIntroduce.container}>
+				<ActivityIndicator size="large" color="#000" />
+			</SafeAreaView>
+		);
+	}
+
 	return (
-		<SafeAreaView style={styleIntroduce.container}>
-			<ScrollView>
+		<NavigationContainer>
+			<SafeAreaView style={styleIntroduce.container}>
+				<StatusBar hidden={true} />
+
 				<TouchableOpacity>
 					<View>
 						<Image
@@ -18,7 +36,9 @@ const Introduce = () => {
 				</TouchableOpacity>
 				<View>
 					<View>
-						<Text style={styleIntroduce.Header}>Coffe Mitang</Text>
+						<Text style={[styleIntroduce.Header, { fontFamily: "Outfit" }]}>
+							Coffee Mitang
+						</Text>
 						<Text style={styleIntroduce.Text1}>Handmade milk tea</Text>
 					</View>
 					<View style={styleIntroduce.coffe}>
@@ -31,8 +51,8 @@ const Introduce = () => {
 					</View>
 					<Text style={styleIntroduce.version}>Version 2.0.3</Text>
 				</View>
-			</ScrollView>
-		</SafeAreaView>
+			</SafeAreaView>
+		</NavigationContainer>
 	);
 };
 

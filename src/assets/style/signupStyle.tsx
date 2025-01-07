@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+
 const sigupStyle = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -8,6 +9,7 @@ const sigupStyle = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#FFFFFF",
 		paddingTop: 77,
+		position:"absolute"
 	},
 
 	header: {
@@ -16,6 +18,7 @@ const sigupStyle = StyleSheet.create({
 		fontWeight: "bold",
 		marginBottom: 11,
 		marginLeft: 25,
+		flex: 1,
 	},
 	wellcome: {
 		color: "#A7AEC1",
