@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 const gif1 = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#fff",
+		backgroundColor: "#black",
 	},
 
 	img: {
@@ -23,22 +23,20 @@ const gif1 = StyleSheet.create({
 		color: "black",
 		fontSize: 40,
 		marginLeft: "16%",
-        marginTop: 20,
-        
+		marginTop: 20,
 	},
 	title2: {
 		color: "black",
 		fontSize: 40,
 		marginLeft: "20%",
-    },
-    sum: {
-      marginBottom:20
-  },
+	},
+	sum: {
+		marginBottom: 20,
+	},
 	Text1: {
 		fontSize: 14,
 		color: "#A7AEC1",
-        marginLeft: "20%",
-        
+		marginLeft: "20%",
 	},
 	Text2: {
 		fontSize: 14,
