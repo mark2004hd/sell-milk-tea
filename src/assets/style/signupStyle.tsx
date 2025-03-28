@@ -1,203 +1,189 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+// Lấy kích thước màn hình
+const { width, height } = Dimensions.get("window");
 
 const sigupStyle = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-	},
-	scrollView: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-		paddingTop: 77,
-		position:"absolute"
-	},
-
-	header: {
-		color: "#191D31",
-		fontSize: 22,
-		fontWeight: "bold",
-		marginBottom: 11,
-		marginLeft: 25,
-		flex: 1,
-	},
-	wellcome: {
-		color: "#A7AEC1",
-		fontSize: 14,
-		marginBottom: 38,
-		marginHorizontal: 25,
-	},
-	userName: {
-		color: "#191D31",
-		fontSize: 16,
-		fontWeight: "bold",
-		marginBottom: 10,
-		marginLeft: 26,
-	},
-	input: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FBFBFD",
-		borderColor: "#F9F9F9",
-		borderRadius: 15,
-		borderWidth: 1,
-		paddingHorizontal: 14,
-		marginBottom: 25,
-		marginHorizontal: 24,
-	},
-	userNameigm: {
-		width: 24,
-		height: 24,
-		marginRight: 16,
-	},
-	textInputUserName: {
-		color: "#A7AEC1",
-		fontSize: 14,
-		flex: 1,
-		paddingVertical: 15,
-	},
-	contactPhoneNumber: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FBFBFD",
-		borderColor: "#F9F9F9",
-		borderRadius: 15,
-		borderWidth: 1,
-		paddingHorizontal: 14,
-		marginBottom: 25,
-		marginHorizontal: 24,
-	},
-	phoneNumber: {
-		color: "#191D31",
-		fontSize: 16,
-		fontWeight: "bold",
-		marginBottom: 10,
-		marginLeft: 26,
-	},
-	phoneNumberimg: {
-		width: 24,
-		height: 24,
-		marginRight: 16,
-	},
-	textInputPhoneNumber: {
-		color: "#A7AEC1",
-		fontSize: 14,
-		flex: 1,
-		paddingVertical: 15,
-	},
-
-	textInputPasssWord: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FBFBFD",
-		borderColor: "#F9F9F9",
-		borderRadius: 15,
-		borderWidth: 1,
-		paddingVertical: 15,
-		paddingHorizontal: 14,
-		marginBottom: 50,
-		marginHorizontal: 24,
-		justifyContent: "space-between",
-	},
-	titlePassword: {
-		color: "#191D31",
-		fontSize: 16,
-		fontWeight: "bold",
-		marginBottom: 10,
-		marginLeft: 26,
-	},
-	ViewPassword: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FBFBFD",
-		borderColor: "#F9F9F9",
-		borderRadius: 15,
-		borderWidth: 1,
-		paddingVertical: 15,
-		paddingHorizontal: 14,
-		marginBottom: 50,
-		marginHorizontal: 24,
-	},
-	password: {
-		color: "#A7AEC1",
-		fontSize: 14,
-		flex: 1,
-		paddingVertical: 15,
-	},
-	passwordIGM: {
-		width: 24,
-		height: 24,
-		marginRight: 16,
-	},
-	passwordIGM1: {
-		width: 24,
-		height: 24,
-		marginRight: 16,
-	},
-	eye: {
-		flex: 1,
-	},
-	eyeIMG: {
-		width: 24,
-		height: 23,
-	},
-	ClickSignup: {
-		alignItems: "center",
-		backgroundColor: "#77634C",
-		borderRadius: 30,
-		paddingVertical: 23,
-		marginBottom: 25,
-		marginHorizontal: 24,
-	},
-	textSignup: {
-		color: "#FFFFFF",
-		fontSize: 16,
-		fontWeight: "bold",
-	},
-	loginQickLy: {
-		color: "#A7AEC1",
-		fontSize: 14,
-		marginBottom: 19,
-		marginHorizontal: 150,
-	},
-	signinGG: {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		borderColor: "#F3F3F3",
-		borderRadius: 30,
-		borderWidth: 2,
-		paddingVertical: 15,
-		marginBottom: 15,
-		marginHorizontal: 24,
-	},
-	siginIMG: {
-		width: 31,
-		height: 26,
-		marginRight: 11,
-	},
-	textSigin: {
-		color: "#191D31",
-		fontSize: 16,
-		fontWeight: "bold",
-	},
-	siginTikTok: {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		borderColor: "#F3F3F3",
-		borderRadius: 30,
-		borderWidth: 2,
-		paddingVertical: 15,
-		marginBottom: 62,
-		marginHorizontal: 24,
-	},
-	sigintiktokIMG: {
-		width: 29,
-		height: 27,
-		marginRight: 11,
-	},
-	texttiktokSigin: { color: "#191D31", fontSize: 16, fontWeight: "bold" },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingTop: height * 0.1, // 10% chiều cao thay vì 77 cố định
+    // Xóa position: "absolute" vì không cần thiết trong hầu hết trường hợp
+  },
+  header: {
+    color: "#191D31",
+    fontSize: width * 0.058, // ~22px trên màn 375px
+    fontWeight: "bold",
+    marginBottom: height * 0.015, // ~11px
+    marginLeft: width * 0.066, // ~25px
+  },
+  wellcome: {
+    color: "#A7AEC1",
+    fontSize: width * 0.037, // ~14px
+    marginBottom: height * 0.05, // ~38px
+    marginHorizontal: width * 0.066, // ~25px
+  },
+  userName: {
+    color: "#191D31",
+    fontSize: width * 0.042, // ~16px
+    fontWeight: "bold",
+    marginBottom: height * 0.013, // ~10px
+    marginLeft: width * 0.069, // ~26px
+  },
+  input: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FBFBFD",
+    borderColor: "#F9F9F9",
+    borderRadius: 15,
+    borderWidth: 1,
+    paddingHorizontal: width * 0.037, // ~14px
+    marginBottom: height * 0.033, // ~25px
+    marginHorizontal: width * 0.064, // ~24px
+  },
+  userNameigm: {
+    width: width * 0.064, // ~24px
+    height: width * 0.064, // ~24px
+    marginRight: width * 0.042, // ~16px
+  },
+  textInputUserName: {
+    color: "#A7AEC1",
+    fontSize: width * 0.037, // ~14px
+    flex: 1,
+    paddingVertical: height * 0.02, // ~15px
+  },
+  phoneNumber: {
+    color: "#191D31",
+    fontSize: width * 0.042, // ~16px
+    fontWeight: "bold",
+    marginBottom: height * 0.013, // ~10px
+    marginLeft: width * 0.069, // ~26px
+  },
+  contactPhoneNumber: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FBFBFD",
+    borderColor: "#F9F9F9",
+    borderRadius: 15,
+    borderWidth: 1,
+    paddingHorizontal: width * 0.037, // ~14px
+    marginBottom: height * 0.033, // ~25px
+    marginHorizontal: width * 0.064, // ~24px
+  },
+  phoneNumberimg: {
+    width: width * 0.064, // ~24px
+    height: width * 0.064, // ~24px
+    marginRight: width * 0.042, // ~16px
+  },
+  textInputPhoneNumber: {
+    color: "#A7AEC1",
+    fontSize: width * 0.037, // ~14px
+    flex: 1,
+    paddingVertical: height * 0.02, // ~15px
+  },
+  titlePassword: {
+    color: "#191D31",
+    fontSize: width * 0.042, // ~16px
+    fontWeight: "bold",
+    marginBottom: height * 0.013, // ~10px
+    marginLeft: width * 0.069, // ~26px
+  },
+  ViewPassword: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FBFBFD",
+    borderColor: "#F9F9F9",
+    borderRadius: 15,
+    borderWidth: 1,
+    paddingVertical: height * 0.02, // ~15px
+    paddingHorizontal: width * 0.037, // ~14px
+    marginBottom: height * 0.066, // ~50px
+    marginHorizontal: width * 0.064, // ~24px
+  },
+  password: {
+    color: "#A7AEC1",
+    fontSize: width * 0.037, // ~14px
+    flex: 1,
+  },
+  passwordIGM1: {
+    width: width * 0.064, // ~24px
+    height: width * 0.064, // ~24px
+    marginRight: width * 0.042, // ~16px
+  },
+  eye: {
+    // Không cần flex: 1 ở đây vì nó không ảnh hưởng nhiều
+  },
+  eyeIMG: {
+    width: width * 0.064, // ~24px
+    height: width * 0.061, // ~23px
+  },
+  ClickSignup: {
+    alignItems: "center",
+    backgroundColor: "#77634C",
+    borderRadius: 30,
+    paddingVertical: height * 0.03, // ~23px
+    marginBottom: height * 0.033, // ~25px
+    marginHorizontal: width * 0.064, // ~24px
+  },
+  textSignup: {
+    color: "#FFFFFF",
+    fontSize: width * 0.042, // ~16px
+    fontWeight: "bold",
+  },
+  loginQickLy: {
+    color: "#A7AEC1",
+    fontSize: width * 0.037, // ~14px
+    marginBottom: height * 0.025, // ~19px
+    textAlign: "center", // Thay marginHorizontal cố định để căn giữa
+  },
+  signinGG: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#F3F3F3",
+    borderRadius: 30,
+    borderWidth: 2,
+    paddingVertical: height * 0.02, // ~15px
+    marginBottom: height * 0.02, // ~15px
+    marginHorizontal: width * 0.064, // ~24px
+  },
+  siginIMG: {
+    width: width * 0.082, // ~31px
+    height: width * 0.069, // ~26px
+    marginRight: width * 0.029, // ~11px
+  },
+  textSigin: {
+    color: "#191D31",
+    fontSize: width * 0.042, // ~16px
+    fontWeight: "bold",
+  },
+  siginTikTok: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#F3F3F3",
+    borderRadius: 30,
+    borderWidth: 2,
+    paddingVertical: height * 0.02, // ~15px
+    marginBottom: height * 0.082, // ~62px
+    marginHorizontal: width * 0.064, // ~24px
+  },
+  sigintiktokIMG: {
+    width: width * 0.077, // ~29px
+    height: width * 0.072, // ~27px
+    marginRight: width * 0.029, // ~11px
+  },
+  texttiktokSigin: {
+    color: "#191D31",
+    fontSize: width * 0.042, // ~16px
+    fontWeight: "bold",
+  },
 });
+
 export default sigupStyle;

@@ -28,7 +28,7 @@ export default function Signup() {
 						onChangeText={setUsername}
 					/>
 				</View>
-				<Text style={sigupStyle.phoneNumber}>Phone Number</Text>
+				<Text style={sigupStyle.phoneNumber}>Email</Text>
 				<View style={sigupStyle.contactPhoneNumber}>
 					<Image
 						style={sigupStyle.phoneNumberimg}
@@ -39,7 +39,7 @@ export default function Signup() {
 					/>
 					<TextInput
 						style={sigupStyle.textInputPhoneNumber}
-						placeholder={"Enter contact Phone Number"}
+						placeholder={"Enter Email address"}
 						value={phoneNumber}
 						onChangeText={setPhoneNumber}
 					/>
@@ -77,7 +77,7 @@ export default function Signup() {
 				<TouchableOpacity style={sigupStyle.signinGG} onPress={() => alert("Pressed!")}>
 					<Image
 						source={{
-							uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/f5628303-8334-46b9-8f1b-bd66523df45a",
+							uri: "https://s3-alpha-sig.figma.com/img/aca9/017d/ccbdf4aad9a888a07bce42f5210b3a99?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=sDRiQpl-dFVC0scKIXNQ5B5wcMErS8~SdvNIK1BxhBz-H2yus4nVhaC0E4EJkLGef4AxWI0zbAGuqAEc24Z2~rRRktMF~65ZV~nQUBZhovv~jULUSQNWVQRHVtZLoqmD-KLJrQyLx2A7usfJwN7OeHGLksAsVYBvZ~bpOv3O9lejjud45raAZVb2JtkbavMe~4pC1b0YwKjbEo9KV1-O9cRhLH0SZVH3VIkf97FNMYdIeT9enZad9LB8yJB7S5t71h71Woacw000U3jtmZnqisDWFcTc9nWXBb-umyPmCYe9bAVOdn2qIySgQfafbnC~f~ZVZyH59AXBS30gBWXLTw__",
 						}}
 						resizeMode={"stretch"}
 						style={sigupStyle.siginIMG}
@@ -87,7 +87,8 @@ export default function Signup() {
 				<TouchableOpacity style={sigupStyle.siginTikTok} onPress={() => alert("Pressed!")}>
 					<Image
 						source={{
-							uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/910d3877-3dab-430e-8855-ef8bbcf701e1",
+							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/facebook.png"
+
 						}}
 						resizeMode={"stretch"}
 						style={sigupStyle.sigintiktokIMG}
