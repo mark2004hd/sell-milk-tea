@@ -3,7 +3,7 @@ import { StyleSheet, Dimensions } from "react-native";
 // Lấy kích thước màn hình
 const { width, height } = Dimensions.get("window");
 
-const sigupStyle = StyleSheet.create({
+const loginStyle = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -24,7 +24,7 @@ const sigupStyle = StyleSheet.create({
   wellcome: {
     color: "#A7AEC1",
     fontSize: width * 0.037, // ~14px
-    marginBottom: height * 0.05, // ~38px
+    marginBottom: height * 0.09, // ~38px
     marginHorizontal: width * 0.066, // ~25px
   },
   userName: {
@@ -121,7 +121,7 @@ const sigupStyle = StyleSheet.create({
     width: width * 0.064, // ~24px
     height: width * 0.061, // ~23px
   },
-  ClickSignup: {
+  ClickLogin: {
     alignItems: "center",
     backgroundColor: "#77634C",
     borderRadius: 30,
@@ -129,7 +129,7 @@ const sigupStyle = StyleSheet.create({
     marginBottom: height * 0.033, // ~25px
     marginHorizontal: width * 0.064, // ~24px
   },
-  textSignup: {
+  textLogin: {
     color: "#FFFFFF",
     fontSize: width * 0.042, // ~16px
     fontWeight: "bold",
@@ -186,4 +186,4 @@ const sigupStyle = StyleSheet.create({
   },
 });
 
-export default sigupStyle;
+export default loginStyle;

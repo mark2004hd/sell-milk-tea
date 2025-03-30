@@ -4,9 +4,9 @@ import sigupStyle from "../style/signupStyle";
 
 export default function Signup() {
 	const [username, setUsername] = useState("");
-	const [phoneNumber, setPhoneNumber] = useState("");
+	const [Emailr, setEmailr] = useState("");
 	const [password, setPassword] = useState("");
-
+    
 	return (
 		<SafeAreaView style={sigupStyle.container}>
 			<ScrollView style={sigupStyle.scrollView}>
@@ -17,7 +17,7 @@ export default function Signup() {
 					<Image
 						style={sigupStyle.userNameigm}
 						source={{
-							uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cf035ba1-ff42-4b59-bd27-c10d4188db2b",
+							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/profile.png",
 						}}
 						resizeMode={"contain"}
 					/>
@@ -28,20 +28,20 @@ export default function Signup() {
 						onChangeText={setUsername}
 					/>
 				</View>
-				<Text style={sigupStyle.phoneNumber}>Email</Text>
-				<View style={sigupStyle.contactPhoneNumber}>
+				<Text style={sigupStyle.Email}>Email</Text>
+				<View style={sigupStyle.contactEmail}>
 					<Image
-						style={sigupStyle.phoneNumberimg}
+						style={sigupStyle.Emailimg}
 						source={{
-							uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/9d58d294-4015-42d9-8f0d-607f97afe9ba",
+							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/user.png",
 						}}
 						resizeMode={"contain"}
 					/>
 					<TextInput
-						style={sigupStyle.textInputPhoneNumber}
+						style={sigupStyle.textInputEmail}
 						placeholder={"Enter Email address"}
-						value={phoneNumber}
-						onChangeText={setPhoneNumber}
+						value={Emailr}
+						onChangeText={setEmailr}
 					/>
 				</View>
 				<Text style={sigupStyle.titlePassword}>Password</Text>
@@ -63,7 +63,7 @@ export default function Signup() {
 					<TouchableOpacity>
 						<Image
 							source={{
-								uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4a8cb955-e39b-40e3-b6ce-a817a6ce6735",
+								uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/eye.png",
 							}}
 							resizeMode={"stretch"}
 							style={sigupStyle.eyeIMG}
@@ -77,7 +77,7 @@ export default function Signup() {
 				<TouchableOpacity style={sigupStyle.signinGG} onPress={() => alert("Pressed!")}>
 					<Image
 						source={{
-							uri: "https://s3-alpha-sig.figma.com/img/aca9/017d/ccbdf4aad9a888a07bce42f5210b3a99?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=sDRiQpl-dFVC0scKIXNQ5B5wcMErS8~SdvNIK1BxhBz-H2yus4nVhaC0E4EJkLGef4AxWI0zbAGuqAEc24Z2~rRRktMF~65ZV~nQUBZhovv~jULUSQNWVQRHVtZLoqmD-KLJrQyLx2A7usfJwN7OeHGLksAsVYBvZ~bpOv3O9lejjud45raAZVb2JtkbavMe~4pC1b0YwKjbEo9KV1-O9cRhLH0SZVH3VIkf97FNMYdIeT9enZad9LB8yJB7S5t71h71Woacw000U3jtmZnqisDWFcTc9nWXBb-umyPmCYe9bAVOdn2qIySgQfafbnC~f~ZVZyH59AXBS30gBWXLTw__",
+							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/google.png",
 						}}
 						resizeMode={"stretch"}
 						style={sigupStyle.siginIMG}

@@ -1,16 +1,72 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { useFonts } from "expo-font";
-import React from "react";
-import { ActivityIndicator, Image, SafeAreaView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect } from "react";
+import {
+	ActivityIndicator,
+	Animated,
+	Image,
+	SafeAreaView,
+	StatusBar,
+	Text,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import styleIntroduce from "../style/styleIntroduce";
 
-const Introduce = () => {
-	// Tải font
+// Define the RootStackParamList type
+type RootStackParamList = {
+	Introduce: undefined;
+	Login: undefined;
+	Gift: undefined;
+};
+
+type IntroduceScreenNavigationProp = StackNavigationProp<RootStackParamList, "Introduce">;
+
+const Introduce = ({ navigation }: { navigation: IntroduceScreenNavigationProp }) => {
 	const [fontsLoaded] = useFonts({
 		Outfit: require("../components/font/Outfit-VariableFont_wght.ttf"),
 	});
 
-	// Kiểm tra nếu font chưa được tải
+	// Tạo giá trị Animated cho hiệu ứng mờ dần
+	const fadeAnim = React.useRef(new Animated.Value(0.2)).current;
+	const scaleAnim = React.useRef(new Animated.Value(0.5)).current; // Scale
+	const slideAnim = React.useRef(new Animated.Value(100)).current;
+
+	// Hiệu ứng fade-in và điều hướng
+	useEffect(() => {
+		// Fade in
+		Animated.parallel([
+			Animated.timing(fadeAnim, {
+				toValue: 1,
+				duration: 1500,
+				useNativeDriver: true,
+			}),
+			Animated.timing(scaleAnim, {
+				toValue: 1,
+				duration: 1500,
+				useNativeDriver: true,
+			}),
+			Animated.spring(slideAnim, {
+				toValue: 0,
+				friction: 8,
+				tension: 40,
+				useNativeDriver: true,
+			}),
+		]).start();
+
+		// Fade out sau 2 giây, sau đó điều hướng
+		const fadeOutTimer = setTimeout(() => {
+			Animated.timing(fadeAnim, {
+				toValue: 0,
+				duration: 500, // Thời gian mờ dần
+				useNativeDriver: true,
+			}).start(() => {
+				navigation.replace("Login");
+			});
+		}, 2000);
+
+		return () => clearTimeout(fadeOutTimer);
+	}, [fadeAnim, scaleAnim, slideAnim, navigation]);
 	if (!fontsLoaded) {
 		return (
 			<SafeAreaView style={styleIntroduce.container}>
@@ -20,10 +76,16 @@ const Introduce = () => {
 	}
 
 	return (
-		<NavigationContainer>
-			<SafeAreaView style={styleIntroduce.container}>
-				<StatusBar hidden={true} />
-
+		<SafeAreaView style={styleIntroduce.container}>
+			<StatusBar hidden={true} />
+			<Animated.View
+				style={{
+					opacity: fadeAnim,
+					transform: [{ scale: scaleAnim }, { translateY: slideAnim }],
+					flex: 1,
+					justifyContent: "center",
+					alignItems: "center",
+				}}>
 				<TouchableOpacity>
 					<View>
 						<Image
@@ -51,8 +113,8 @@ const Introduce = () => {
 					</View>
 					<Text style={styleIntroduce.version}>Version 2.0.3</Text>
 				</View>
-			</SafeAreaView>
-		</NavigationContainer>
+			</Animated.View>
+		</SafeAreaView>
 	);
 };
 
