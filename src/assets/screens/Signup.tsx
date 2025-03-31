@@ -1,12 +1,23 @@
+import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useState } from "react";
 import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import sigupStyle from "../style/signupStyle";
+type RootStackParamList = {
+	Signup: undefined;
+	Login: undefined; // Added Login route
+};
 
-export default function Signup() {
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">;
+
+interface LoginProps {
+	navigation: LoginScreenNavigationProp;
+}
+
+export default function Signup({ navigation }: LoginProps) {
 	const [username, setUsername] = useState("");
 	const [Emailr, setEmailr] = useState("");
 	const [password, setPassword] = useState("");
-    
+
 	return (
 		<SafeAreaView style={sigupStyle.container}>
 			<ScrollView style={sigupStyle.scrollView}>
@@ -48,7 +59,7 @@ export default function Signup() {
 				<View style={sigupStyle.ViewPassword}>
 					<Image
 						source={{
-							uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/41ce6311-7f9e-4301-98db-40bc5c636808",
+							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/password.png",
 						}}
 						resizeMode={"stretch"}
 						style={sigupStyle.passwordIGM1}
@@ -73,7 +84,9 @@ export default function Signup() {
 				<TouchableOpacity onPress={() => alert("Pressed!")} style={sigupStyle.ClickSignup}>
 					<Text style={sigupStyle.textSignup}>Sign up</Text>
 				</TouchableOpacity>
-				<Text style={sigupStyle.loginQickLy}>Login quickly</Text>
+				<TouchableOpacity onPress={() => navigation.navigate("Login")}>
+					<Text style={sigupStyle.loginQickLy}>Login qickly</Text>
+				</TouchableOpacity>
 				<TouchableOpacity style={sigupStyle.signinGG} onPress={() => alert("Pressed!")}>
 					<Image
 						source={{
@@ -87,8 +100,7 @@ export default function Signup() {
 				<TouchableOpacity style={sigupStyle.siginTikTok} onPress={() => alert("Pressed!")}>
 					<Image
 						source={{
-							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/facebook.png"
-
+							uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/facebook.png",
 						}}
 						resizeMode={"stretch"}
 						style={sigupStyle.sigintiktokIMG}

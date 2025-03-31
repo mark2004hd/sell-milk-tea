@@ -1,18 +1,88 @@
-import React, { useState } from "react";
-import { Image, SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import React, { useEffect, useState } from "react";
+import {
+	BackHandler,
+	Image,
+	SafeAreaView,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
+} from "react-native";
+import Modal from "react-native-modal";
+import signupStyle from "../style/signupStyle";
 import loginStyle from "../style/styleLogin";
-export default function Login() {
-	const [username, setUsername] = useState("");
-	const [Email, setEmail] = useState("");
+
+type RootStackParamList = {
+	Introduce: undefined;
+	Signup: undefined;
+	Login: undefined;
+};
+
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">;
+
+interface LoginProps {
+	navigation: LoginScreenNavigationProp;
+}
+
+export default function Login({ navigation }: LoginProps) {
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [backPressCount, setBackPressCount] = useState(0);
+	const [isModalVisible, setModalVisible] = useState(false);
+
+	useEffect(() => {
+		const backAction = () => {
+			// Chỉ áp dụng logic nếu đang ở màn hình Login
+			const currentRoute = navigation.getState()?.routes[navigation.getState().index].name;
+			if (currentRoute !== "Login") {
+				return false; // Không can thiệp nếu không phải màn hình Login
+			}
+
+			if (backPressCount === 0) {
+				setBackPressCount(1);
+				setTimeout(() => {
+					setBackPressCount(0);
+				}, 2000);
+				return true;
+			} else if (backPressCount === 1) {
+				setModalVisible(true);
+				setBackPressCount(2);
+				setTimeout(() => {
+					setModalVisible(false);
+					setBackPressCount(0);
+				}, 3500);
+				return true;
+			} else if (backPressCount === 2) {
+				BackHandler.exitApp();
+				return true;
+			}
+			return false;
+		};
+
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+
+		// Dọn dẹp khi component unmount (rời khỏi màn hình Login)
+		return () => backHandler.remove();
+	}, [backPressCount, navigation]);
+
+	const handleExit = () => {
+		setModalVisible(false);
+		BackHandler.exitApp();
+	};
+
+	const handleCancel = () => {
+		setModalVisible(false);
+		setBackPressCount(0);
+	};
 
 	return (
 		<SafeAreaView style={loginStyle.container}>
-			
 			<ScrollView style={loginStyle.scrollView}>
 				<Text style={loginStyle.header}>Login</Text>
-				<Text style={loginStyle.wellcome}>Welcome to Bee Coffee, create an account now!</Text>
-
+				<Text style={loginStyle.wellcome}>Welcome to Bee Coffee, login to your account!</Text>
 				<Text style={loginStyle.Email}>Email</Text>
 				<View style={loginStyle.contactEmail}>
 					<Image
@@ -25,7 +95,7 @@ export default function Login() {
 					<TextInput
 						style={loginStyle.textInputEmail}
 						placeholder={"Enter Email address or Username"}
-						value={Email}
+						value={email}
 						onChangeText={setEmail}
 					/>
 				</View>
@@ -43,8 +113,8 @@ export default function Login() {
 						style={loginStyle.password}
 						value={password}
 						onChangeText={setPassword}
+						secureTextEntry
 					/>
-					<View style={loginStyle.eye}></View>
 					<TouchableOpacity>
 						<Image
 							source={{
@@ -58,7 +128,9 @@ export default function Login() {
 				<TouchableOpacity onPress={() => alert("Pressed!")} style={loginStyle.ClickLogin}>
 					<Text style={loginStyle.textLogin}>Login</Text>
 				</TouchableOpacity>
-				<Text style={loginStyle.loginQickLy}>Singin</Text>
+				<TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+					<Text style={signupStyle.loginQickLy}>Sign up</Text>
+				</TouchableOpacity>
 				<TouchableOpacity style={loginStyle.signinGG} onPress={() => alert("Pressed!")}>
 					<Image
 						source={{
@@ -67,7 +139,7 @@ export default function Login() {
 						resizeMode={"stretch"}
 						style={loginStyle.siginIMG}
 					/>
-					<Text style={loginStyle.textSigin}>{"Sign in with google"}</Text>
+					<Text style={loginStyle.textSigin}>{"Sign in with Google"}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity style={loginStyle.siginTikTok} onPress={() => alert("Pressed!")}>
 					<Image
@@ -77,9 +149,79 @@ export default function Login() {
 						resizeMode={"stretch"}
 						style={loginStyle.sigintiktokIMG}
 					/>
-					<Text style={loginStyle.texttiktokSigin}>{"Sign in with  Tiktok"}</Text>
+					<Text style={loginStyle.texttiktokSigin}>{"Sign in with TikTok"}</Text>
 				</TouchableOpacity>
 			</ScrollView>
+
+			<Modal
+				isVisible={isModalVisible}
+				backdropOpacity={0.5}
+				animationIn="slideInUp"
+				animationOut="slideOutDown"
+				onBackdropPress={handleCancel}>
+				<View style={styles.modalContainer}>
+					<Text style={styles.modalTitle}>Thoát ứng dụng</Text>
+					<Text style={styles.modalMessage}>Bạn có chắc chắn muốn thoát không?</Text>
+					<View style={styles.buttonContainer}>
+						<TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
+							<Text style={styles.buttonText}>Hủy</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={handleExit} style={styles.exitButton}>
+							<Text style={styles.buttonText}>Thoát</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 		</SafeAreaView>
 	);
 }
+const styles = StyleSheet.create({
+	modalContainer: {
+		backgroundColor: "white",
+		padding: 20,
+		borderRadius: 15,
+		alignItems: "center",
+		elevation: 5,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.3,
+		shadowRadius: 4,
+	},
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: "bold",
+		marginBottom: 10,
+		color: "#333",
+	},
+	modalMessage: {
+		fontSize: 16,
+		marginBottom: 20,
+		textAlign: "center",
+		color: "#666",
+	},
+	buttonContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "80%",
+	},
+	cancelButton: {
+		backgroundColor: "#888",
+		padding: 10,
+		borderRadius: 8,
+		flex: 1,
+		marginRight: 10,
+		alignItems: "center",
+	},
+	exitButton: {
+		backgroundColor: "#FF6347",
+		padding: 10,
+		borderRadius: 8,
+		flex: 1,
+		alignItems: "center",
+	},
+	buttonText: {
+		color: "white",
+		fontSize: 18,
+		fontWeight: "bold",
+	},
+});

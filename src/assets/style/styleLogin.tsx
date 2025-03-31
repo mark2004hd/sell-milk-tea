@@ -135,7 +135,7 @@ const loginStyle = StyleSheet.create({
     fontWeight: "bold",
   },
   loginQickLy: {
-    color: "#A7AEC1",
+    color: "#2E10F2",
     fontSize: width * 0.037, // ~14px
     marginBottom: height * 0.025, // ~19px
     textAlign: "center", // Thay marginHorizontal cố định để căn giữa

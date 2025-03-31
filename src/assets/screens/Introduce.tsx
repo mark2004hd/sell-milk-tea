@@ -17,14 +17,13 @@ import styleIntroduce from "../style/styleIntroduce";
 type RootStackParamList = {
 	Introduce: undefined;
 	Login: undefined;
-	Gift: undefined;
 };
 
 type IntroduceScreenNavigationProp = StackNavigationProp<RootStackParamList, "Introduce">;
 
 const Introduce = ({ navigation }: { navigation: IntroduceScreenNavigationProp }) => {
 	const [fontsLoaded] = useFonts({
-		Outfit: require("../components/font/Outfit-VariableFont_wght.ttf"),
+		Outfit: require("../font/Outfit-VariableFont_wght.ttf"),
 	});
 
 	// Tạo giá trị Animated cho hiệu ứng mờ dần
