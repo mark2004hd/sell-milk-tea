@@ -5,6 +5,7 @@ import sigupStyle from "../style/signupStyle";
 type RootStackParamList = {
 	Signup: undefined;
 	Login: undefined; // Added Login route
+	VerificationCode: undefined; // Added VerificationCode route
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">;
@@ -15,9 +16,28 @@ interface LoginProps {
 
 export default function Signup({ navigation }: LoginProps) {
 	const [username, setUsername] = useState("");
-	const [Emailr, setEmailr] = useState("");
+	const [email, setemail] = useState("");
 	const [password, setPassword] = useState("");
+	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+	const [visibilityTimeout, setVisibilityTimeout] = useState<NodeJS.Timeout | null>(null); // Biến lưu timeout
 
+	const togglePasswordVisibility = () => {
+		// Nếu đã bật hiển thị, hủy timeout cũ trước
+		if (visibilityTimeout) {
+			clearTimeout(visibilityTimeout);
+		}
+
+		// Đảo trạng thái hiển thị mật khẩu
+		setIsPasswordVisible(!isPasswordVisible);
+
+		// Nếu bật lên, đặt hẹn giờ 3s để tắt lại
+		if (!isPasswordVisible) {
+			const timeout = setTimeout(() => {
+				setIsPasswordVisible(false);
+			}, 1500);
+			setVisibilityTimeout(timeout);
+		}
+	};
 	return (
 		<SafeAreaView style={sigupStyle.container}>
 			<ScrollView style={sigupStyle.scrollView}>
@@ -37,6 +57,7 @@ export default function Signup({ navigation }: LoginProps) {
 						placeholder={"Enter username"}
 						value={username}
 						onChangeText={setUsername}
+						placeholderTextColor={username ? "#000" : "#888"}
 					/>
 				</View>
 				<Text style={sigupStyle.Email}>Email</Text>
@@ -51,8 +72,9 @@ export default function Signup({ navigation }: LoginProps) {
 					<TextInput
 						style={sigupStyle.textInputEmail}
 						placeholder={"Enter Email address"}
-						value={Emailr}
-						onChangeText={setEmailr}
+						value={email}
+						onChangeText={setemail}
+						placeholderTextColor={email ? "#000" : "#888"}
 					/>
 				</View>
 				<Text style={sigupStyle.titlePassword}>Password</Text>
@@ -69,9 +91,11 @@ export default function Signup({ navigation }: LoginProps) {
 						style={sigupStyle.password}
 						value={password}
 						onChangeText={setPassword}
+						placeholderTextColor={password ? "#000" : "#888"}
+						secureTextEntry={!isPasswordVisible}
 					/>
 					<View style={sigupStyle.eye}></View>
-					<TouchableOpacity>
+					<TouchableOpacity onPress={() => togglePasswordVisibility()}>
 						<Image
 							source={{
 								uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/eye.png",
@@ -81,7 +105,9 @@ export default function Signup({ navigation }: LoginProps) {
 						/>
 					</TouchableOpacity>
 				</View>
-				<TouchableOpacity onPress={() => alert("Pressed!")} style={sigupStyle.ClickSignup}>
+				<TouchableOpacity
+					onPress={() => navigation.navigate("VerificationCode")}
+					style={sigupStyle.ClickSignup}>
 					<Text style={sigupStyle.textSignup}>Sign up</Text>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={() => navigation.navigate("Login")}>

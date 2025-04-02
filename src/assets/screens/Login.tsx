@@ -32,7 +32,10 @@ export default function Login({ navigation }: LoginProps) {
 	const [password, setPassword] = useState("");
 	const [backPressCount, setBackPressCount] = useState(0);
 	const [isModalVisible, setModalVisible] = useState(false);
-
+	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+	const [visibilityTimeout, setVisibilityTimeout] = useState<NodeJS.Timeout | null>(null);
+	const [username, setUsername] = useState("");
+	const [password1, setPassword1] = useState("");
 	useEffect(() => {
 		const backAction = () => {
 			// Chỉ áp dụng logic nếu đang ở màn hình Login
@@ -77,7 +80,23 @@ export default function Login({ navigation }: LoginProps) {
 		setModalVisible(false);
 		setBackPressCount(0);
 	};
+	const togglePasswordVisibility = () => {
+		// Nếu đã bật hiển thị, hủy timeout cũ trước
+		if (visibilityTimeout) {
+			clearTimeout(visibilityTimeout);
+		}
 
+		// Đảo trạng thái hiển thị mật khẩu
+		setIsPasswordVisible(!isPasswordVisible);
+
+		// Nếu bật lên, đặt hẹn giờ 3s để tắt lại
+		if (!isPasswordVisible) {
+			const timeout = setTimeout(() => {
+				setIsPasswordVisible(false);
+			}, 1500);
+			setVisibilityTimeout(timeout);
+		}
+	};
 	return (
 		<SafeAreaView style={loginStyle.container}>
 			<ScrollView style={loginStyle.scrollView}>
@@ -97,6 +116,7 @@ export default function Login({ navigation }: LoginProps) {
 						placeholder={"Enter Email address or Username"}
 						value={email}
 						onChangeText={setEmail}
+						placeholderTextColor={username ? "#000" : "#888"}
 					/>
 				</View>
 				<Text style={loginStyle.titlePassword}>Password</Text>
@@ -113,9 +133,10 @@ export default function Login({ navigation }: LoginProps) {
 						style={loginStyle.password}
 						value={password}
 						onChangeText={setPassword}
-						secureTextEntry
+						secureTextEntry={!isPasswordVisible} 
+						placeholderTextColor={password? "#000" : "#888"}
 					/>
-					<TouchableOpacity>
+					<TouchableOpacity onPress={togglePasswordVisibility}>
 						<Image
 							source={{
 								uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/eye.png",

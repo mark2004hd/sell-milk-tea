@@ -8,5 +8,5 @@ import VerificationCode from "./src/assets/screens/VerificationCode";
 const Stack = createStackNavigator();
 
 export default function App() {
-	return <VerificationCode/>;
+	return <Router/>;
 }
