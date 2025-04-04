@@ -1,26 +1,42 @@
 {
 	"expo": {
-		"name": "sell-milk-tea",
-		"slug": "sell-milk-tea",
-		"version": "1.0.0",
-		"orientation": "portrait",
-
-		"userInterfaceStyle": "light",
-		"newArchEnabled": true,
-		"splash": {
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+	  "name": "sell-milk-tea",
+	  "slug": "sell-milk-tea",
+	  "version": "1.0.0",
+	  "orientation": "portrait",
+	  "scheme": "sell-milk-tea",
+	  "userInterfaceStyle": "light",
+	  "newArchEnabled": true,
+	  "splash": {
+		"resizeMode": "contain",
+		"backgroundColor": "#ffffff"
+	  },
+	  "ios": {
+		"supportsTablet": true,
+		"bundleIdentifier": "com.yourusername.sellmilktea",
+		"associatedDomains": ["applinks:sell-milk-tea"]
+	  },
+	  "android": {
+		"adaptiveIcon": {
+		  "backgroundColor": "#ffffff"
 		},
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"adaptiveIcon": {
-				"backgroundColor": "#ffffff"
-			}
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		}
+		"package": "com.yourusername.sell-milk-tea",
+		"intentFilters": [
+		  {
+			"action": "VIEW",
+			"autoVerify": true,
+			"data": [
+			  {
+				"scheme": "sell-milk-tea",
+				"host": "*"
+			  }
+			],
+			"category": ["BROWSABLE", "DEFAULT"]
+		  }
+		]
+	  },
+	  "web": {
+		"favicon": "./assets/favicon.png"
+	  }
 	}
-}
+  }
