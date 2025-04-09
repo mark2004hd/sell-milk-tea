@@ -184,8 +184,8 @@ export default function Login({ navigation }: LoginProps) {
   
       const data = await response.json();
       console.log("Login success:", data);
-  
-      // 👇 Lưu token vào AsyncStorage
+     
+      
       // await AsyncStorage.setItem("accessToken", data.accessToken);
   
       // 👇 Điều hướng sang Home (giả sử bạn dùng navigation)
