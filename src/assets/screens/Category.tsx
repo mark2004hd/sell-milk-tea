@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Headers from '../components/Header'; // Import Headers
 
 interface CategoryItem {
   id: string;
@@ -41,12 +42,14 @@ const Category = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Headers /> 
       <FlatList
         data={categories}
         renderItem={renderCategoryItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.categoryList}
+        nestedScrollEnabled={true}
       />
     </SafeAreaView>
   );

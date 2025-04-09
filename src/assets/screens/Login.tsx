@@ -1,7 +1,7 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
-  AppState, // Thêm AppState
+  AppState,
   BackHandler,
   Image,
   SafeAreaView,
@@ -22,9 +22,8 @@ type RootStackParamList = {
   Signup: undefined;
   Login: undefined;
   VerificationCode: undefined;
-  HomeScreen: undefined;
+  MainTabs: undefined; // Sửa từ HomeScreen thành MainTabs
   AuthCallback: { code?: string };
-  MainTabs: undefined;
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">;
@@ -42,7 +41,6 @@ export default function Login({ navigation }: LoginProps) {
   const [visibilityTimeout, setVisibilityTimeout] = useState<NodeJS.Timeout | null>(null);
   const [session, setSession] = useState<any>(null);
 
-  // Xử lý nút back
   useEffect(() => {
     const backAction = () => {
       const currentRoute = navigation.getState()?.routes[navigation.getState().index].name;
@@ -71,13 +69,12 @@ export default function Login({ navigation }: LoginProps) {
     return () => backHandler.remove();
   }, [backPressCount, navigation]);
 
-  // Xử lý phiên đăng nhập và sự kiện xác thực
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
         console.log("Phiên đăng nhập được tìm thấy khi tải ứng dụng:", session);
-        navigation.replace("HomeScreen");
+        navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
       } else {
         console.log("Không tìm thấy phiên đăng nhập khi tải ứng dụng.");
       }
@@ -90,7 +87,7 @@ export default function Login({ navigation }: LoginProps) {
       setSession(session);
       if (event === "SIGNED_IN" && session) {
         console.log("Người dùng đăng nhập thành công:", session);
-        navigation.replace("HomeScreen");
+        navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
       } else if (event === "SIGNED_OUT") {
         console.log("Người dùng đã đăng xuất.");
       } else {
@@ -98,13 +95,12 @@ export default function Login({ navigation }: LoginProps) {
       }
     });
 
-    // Lắng nghe AppState để phát hiện khi ứng dụng quay lại từ trình duyệt
     const handleAppStateChange = async (nextAppState: string) => {
       if (nextAppState === "active") {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           console.log("Phiên sau khi quay lại:", session);
-          navigation.replace("HomeScreen");
+          navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
         }
       }
     };
@@ -152,7 +148,7 @@ export default function Login({ navigation }: LoginProps) {
       }
       console.log("Đăng nhập Google thành công:", data);
       if (data.url) {
-        await WebBrowser.openBrowserAsync(data.url); // Mở URL bằng WebBrowser
+        await WebBrowser.openBrowserAsync(data.url);
       }
     } catch (error) {
       console.error("Lỗi đăng nhập Google:", error);
@@ -180,6 +176,20 @@ export default function Login({ navigation }: LoginProps) {
     }
   };
 
+
+  const handleTempLogin = () => {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+  
+    if (trimmedEmail === "admin" && trimmedPassword === "123") {
+      console.log("Đăng nhập tạm thành công");
+      navigation.replace("MainTabs");
+    } else {
+      alert("Tài khoản hoặc mật khẩu không đúng.");
+    }
+  };
+  
+  
   return (
     <SafeAreaView style={loginStyle.container}>
       <ScrollView style={loginStyle.scrollView}>
@@ -223,7 +233,7 @@ export default function Login({ navigation }: LoginProps) {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleLogin} style={loginStyle.ClickLogin}>
+        <TouchableOpacity onPress={handleTempLogin } style={loginStyle.ClickLogin}>
           <Text style={loginStyle.textLogin}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>

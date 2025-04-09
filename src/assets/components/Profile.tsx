@@ -1,9 +1,10 @@
 import React from "react";
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const Profile = () => {
 	return (
-		<View style={ProfileStyle.container}>
+		<TouchableOpacity>
+				<View style={ProfileStyle.container}>
 			<Image
 				source={{
 					uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/meo.jpg",
@@ -11,6 +12,7 @@ const Profile = () => {
 				style={ProfileStyle.img}
 			/>
 		</View>
+	</TouchableOpacity>
 	);
 };
 
