@@ -42,7 +42,7 @@ const Category = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Headers /> 
+      
       <FlatList
         data={categories}
         renderItem={renderCategoryItem}
