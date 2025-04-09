@@ -24,6 +24,7 @@ type RootStackParamList = {
   VerificationCode: undefined;
   HomeScreen: undefined;
   AuthCallback: { code?: string };
+  MainTabs: undefined;
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">;
