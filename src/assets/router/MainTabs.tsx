@@ -89,7 +89,7 @@ const MainTabs = () => {
         <BottomTab.Screen
           name="HomeTab"
           component={TopTabs}
-          options={{ title: '首页', headerShown: false }}
+          options={{ title: 'Home', headerShown: false }}
           listeners={{
             tabPress: () => setCurrentTab('HomeTab'),
           }}
@@ -97,7 +97,7 @@ const MainTabs = () => {
         <BottomTab.Screen
           name="MyOrders"
           component={MyOrdersScreen}
-          options={{ title: '我的订单', headerShown: false }}
+          options={{ title: 'Orders', headerShown: false }}
           listeners={{
             tabPress: () => setCurrentTab('MyOrders'),
           }}
@@ -105,7 +105,7 @@ const MainTabs = () => {
         <BottomTab.Screen
           name="Favorites"
           component={FavoritesScreen}
-          options={{ title: '最爱', headerShown: false }}
+          options={{ title: 'Favorites', headerShown: false }}
           listeners={{
             tabPress: () => setCurrentTab('Favorites'),
           }}
@@ -113,7 +113,7 @@ const MainTabs = () => {
         <BottomTab.Screen
           name="Profile"
           component={ProfileScreen}
-          options={{ title: '个人主页', headerShown: false }}
+          options={{ title: 'Profile', headerShown: false }}
           listeners={{
             tabPress: () => setCurrentTab('Profile'),
           }}

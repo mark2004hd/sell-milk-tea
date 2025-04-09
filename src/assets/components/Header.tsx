@@ -108,11 +108,11 @@ const Header = () => {
 export const headerstyle = StyleSheet.create({
 	headerView: {
 		padding: 10,
-		marginHorizontal: "2%",
-		marginVertical: "9%",
+
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
+		backgroundColor: "#fff",
 	},
 	leftContainer: {
 		flexDirection: "row",

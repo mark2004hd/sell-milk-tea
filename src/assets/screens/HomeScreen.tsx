@@ -7,28 +7,59 @@ interface Promotion {
 	title: string;
 	price: string;
 	image: string;
+	description: string;
 }
 
 const bannerImages = [
-	"https://github.com/mark2004hd/img-api/raw/master/img/tab.png",
-	"https://github.com/mark2004hd/img-api/raw/master/img/introhome1.jpg",
-	"https://github.com/mark2004hd/img-api/raw/master/img/introhome3.jpg",
-
-	// Thêm ảnh khác nếu muốn
+	"https://raw.githubusercontent.com/mark2004hd/img-api/master/img/tab.png",
+	"https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome1.jpg",
+	"https://raw.githubusercontent.com/mark2004hd/img-api/master/img/intro5.jpg",
+	"https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome3.jpg",
+	"https://raw.githubusercontent.com/mark2004hd/img-api/master/img/intro6.jpg",
 ];
 
 const promotions: Promotion[] = [
 	{
 		id: "1",
-		title: "400 TIMES COCONUT LATTE CONTAINS COFFINE DAIRY",
-		price: "2,75USD",
-		image: "https://via.placeholder.com/150", // Thay bằng URL hình ảnh thực tế
+		title: "Caramel Matcha Latte",
+		price: "3.45USD",
+		description: "CONTAINS CAFFEINE|MINTY FRESH",
+		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
 	},
 	{
 		id: "2",
-		title: "PREMIUM TARO PEACH GUM THICK PASTO RICE MOCHI",
-		price: "1,92USD",
-		image: "https://via.placeholder.com/150", // Thay bằng URL hình ảnh thực tế
+		title: "Strawberry Cheese",
+		price: "2.15USD",
+		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
+		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+	},
+	{
+		id: "3",
+		title: "Choco Mint Delight",
+		price: "4.32USD",
+		description: "RICH COCOA |COOLING MINT|SMOOTH TEXTURE",
+		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+	},
+	{
+		id: "4",
+		title: "Green Apple Mojito",
+		price: "1.89USD",
+		description: "REFRESHING | HINT OF LIME | FRUITY BURST",
+		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+	},
+	{
+		id: "5",
+		title: "Double Espresso Shot",
+		price: "2.75USD",
+		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
+		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+	},
+	{
+		id: "6",
+		title: "Tropical Fruit Yogurt",
+		price: "3.90USD",
+		description: "CREAMY YOGURT | MIXED TROPICAL FRUITS | CHILLED",
+		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
 	},
 ];
 
@@ -41,15 +72,20 @@ const HomeScreen = () => {
 			const nextIndex = (currentBanner + 1) % bannerImages.length;
 			setCurrentBanner(nextIndex);
 			flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-		}, 3000); // Mỗi 3 giây
+		}, 3000);
 
-		return () => clearInterval(interval); // Clear khi unmount
+		return () => clearInterval(interval);
 	}, [currentBanner]);
 
 	const renderPromotionItem = ({ item }: { item: Promotion }) => (
 		<View style={styles.promotionCard}>
-			<Image source={{ uri: item.image }} style={styles.promotionImage} />
+			<Image
+				source={{ uri: item.image }}
+				style={styles.promotionImage}
+				onError={(error) => console.log("Image load error:", error.nativeEvent)}
+			/>
 			<Text style={styles.promotionTitle}>{item.title}</Text>
+			<Text style={styles.promotionDescription}>{item.description}</Text>
 			<Text style={styles.promotionPrice}>{item.price}</Text>
 		</View>
 	);
@@ -64,25 +100,36 @@ const HomeScreen = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<FlatList
-				data={[{ key: "content" }]} // Sử dụng FlatList để bọc toàn bộ nội dung
+				data={[{ key: "content" }]}
 				renderItem={() => (
 					<>
 						{/* Banner Carousel */}
 						<View>
-							{/* Replace <Headers /> with the correct component or remove it */}
-							{/* <CorrectComponent /> */}
 							<FlatList
 								ref={flatListRef}
 								data={bannerImages}
 								horizontal
 								pagingEnabled
-								scrollEnabled={false}
+								scrollEnabled={true} // Enable swiping
 								showsHorizontalScrollIndicator={false}
 								keyExtractor={(item, index) => index.toString()}
 								renderItem={renderBannerItem}
+								snapToInterval={Dimensions.get("window").width - 32}
+								snapToAlignment="center"
+								onScroll={(event) => {
+									const contentOffsetX =
+										event.nativeEvent.contentOffset.x;
+									const index = Math.round(
+										contentOffsetX /
+											(Dimensions.get("window")
+												.width -
+												32),
+									);
+									setCurrentBanner(index);
+								}}
 								onScrollToIndexFailed={(info) => {
 									const wait = new Promise((resolve) =>
-										setTimeout(resolve, 500),
+										setTimeout(resolve, 100),
 									);
 									wait.then(() => {
 										flatListRef.current?.scrollToIndex({
@@ -92,23 +139,34 @@ const HomeScreen = () => {
 									});
 								}}
 							/>
-							{/* Dots Indicator */}
 							<View style={styles.dotsContainer}>
-								{bannerImages.map((_, index) => (
+								{[0, 1, 2].map((index) => (
 									<View
 										key={index}
 										style={[
 											styles.dot,
 											{
 												backgroundColor:
-													index ===
-													currentBanner
+													currentBanner ===
+													index
 														? "#8B4513"
 														: "#ccc",
 											},
 										]}
 									/>
 								))}
+								<View
+									style={[
+										styles.dot,
+										styles.halfDot,
+										{
+											backgroundColor:
+												currentBanner >= 3
+													? "#8B4513"
+													: "#ccc",
+										},
+									]}
+								/>
 							</View>
 						</View>
 
@@ -128,8 +186,8 @@ const HomeScreen = () => {
 								data={promotions}
 								renderItem={renderPromotionItem}
 								keyExtractor={(item) => item.id}
-								horizontal
-								showsHorizontalScrollIndicator={false}
+								numColumns={2}
+								showsVerticalScrollIndicator={false}
 								style={styles.promotionList}
 								nestedScrollEnabled={true}
 								scrollEnabled={true}
@@ -154,7 +212,7 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		borderRadius: 10,
 		overflow: "hidden",
-		width: Dimensions.get("window").width - 32, // Chiều rộng bằng chiều rộng màn hình trừ margin
+		width: Dimensions.get("window").width - 32,
 	},
 	bannerImage: {
 		width: "100%",
@@ -167,7 +225,7 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		fontSize: 16,
 		fontWeight: "bold",
-		textTransform: "uppercase", // In hoa
+		textTransform: "uppercase",
 	},
 	dotsContainer: {
 		flexDirection: "row",
@@ -180,6 +238,10 @@ const styles = StyleSheet.create({
 		height: 8,
 		borderRadius: 4,
 		marginHorizontal: 4,
+	},
+	halfDot: {
+		// Added for half dot
+		width: 4,
 	},
 	promotionsContainer: {
 		marginTop: 20,
@@ -194,35 +256,49 @@ const styles = StyleSheet.create({
 	sectionTitle: {
 		fontSize: 20,
 		fontWeight: "bold",
-		textTransform: "uppercase", // In hoa
+		textTransform: "uppercase",
 	},
 	promotionList: {
 		marginBottom: 10,
 	},
 	promotionCard: {
-		marginRight: 10,
-		width: 150,
-		backgroundColor: "#f9f9f9",
+		flex: 1,
+		margin: 5,
+		backgroundColor: "#fff",
 		borderRadius: 10,
 		padding: 10,
 		alignItems: "center",
+		maxWidth: (Dimensions.get("window").width - 48) / 2,
 	},
 	promotionImage: {
-		width: 100,
-		height: 100,
+		width: "100%",
+		height: 200,
 		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: "#ccc",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		elevation: 3,
 	},
 	promotionTitle: {
 		fontSize: 14,
 		fontWeight: "bold",
 		marginTop: 5,
 		textAlign: "center",
-		textTransform: "uppercase", // In hoa
+		textTransform: "uppercase",
 	},
 	promotionPrice: {
 		fontSize: 12,
 		color: "#888",
 		marginTop: 5,
+	},
+	promotionDescription: {
+		fontSize: 12,
+		color: "#555",
+		marginTop: 5,
+		textAlign: "center",
 	},
 	viewMoreButton: {
 		paddingVertical: 5,
@@ -231,7 +307,7 @@ const styles = StyleSheet.create({
 	viewMoreText: {
 		fontSize: 14,
 		color: "#333",
-		textTransform: "uppercase", // In hoa
+		textTransform: "uppercase",
 	},
 });
 
