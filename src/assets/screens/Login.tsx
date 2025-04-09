@@ -1,6 +1,7 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   AppState,
   BackHandler,
   Image,
@@ -156,25 +157,6 @@ export default function Login({ navigation }: LoginProps) {
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) {
-        console.error("Lỗi đăng nhập:", error.message);
-        alert("Đăng nhập thất bại: " + error.message);
-        return;
-      }
-
-      console.log("Đăng nhập thành công:", data);
-    } catch (error) {
-      console.error("Lỗi không xác định:", error);
-      alert("Đã xảy ra lỗi. Vui lòng thử lại.");
-    }
-  };
 
 
   const handleTempLogin = () => {
@@ -186,6 +168,42 @@ export default function Login({ navigation }: LoginProps) {
       navigation.replace("MainTabs");
     } else {
       alert("Tài khoản hoặc mật khẩu không đúng.");
+    }
+  };
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://192.168.74.73:8080/zen8labs-system/auth/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+          email: email,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+        Alert.alert("Login Failed", errorData.message || "Invalid credentials");
+
+        return;
+      }
+  
+      const data = await response.json();
+      console.log("Login success:", data);
+      navigation.replace("MainTabs");
+      // 👇 Lưu token vào AsyncStorage
+      // await AsyncStorage.setItem("accessToken", data.accessToken);
+  
+      // 👇 Điều hướng sang Home (giả sử bạn dùng navigation)
+     
+  
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
   
@@ -233,7 +251,7 @@ export default function Login({ navigation }: LoginProps) {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleTempLogin } style={loginStyle.ClickLogin}>
+        <TouchableOpacity onPress={handleLogin } style={loginStyle.ClickLogin}>
           <Text style={loginStyle.textLogin}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>

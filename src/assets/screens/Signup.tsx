@@ -1,6 +1,6 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useState } from "react";
-import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import sigupStyle from "../style/signupStyle";
 type RootStackParamList = {
 	Signup: undefined;
@@ -36,6 +36,41 @@ export default function Signup({ navigation }: LoginProps) {
 				setIsPasswordVisible(false);
 			}, 1500);
 			setVisibilityTimeout(timeout);
+		}
+	};
+
+
+	const handleSignup = async () => {
+		if (!username || !email || !password) {
+			Alert.alert("Error", "Please fill in all fields");
+			return;
+		}
+
+		try {
+			const response = await fetch("http://192.168.74.73:8080/zen8labs-system/api/v1/users", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					username,
+					email,
+					password,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (response.ok) {
+				Alert.alert("Success", "Signup successful!");
+				navigation.navigate("Login");
+				
+			} else {
+				Alert.alert("Signup failed", data.message || "Unknown error");
+			}
+		} catch (error) {
+			console.error("Signup error:", error);
+			Alert.alert("Error", "Something went wrong.");
 		}
 	};
 	return (
@@ -106,7 +141,7 @@ export default function Signup({ navigation }: LoginProps) {
 					</TouchableOpacity>
 				</View>
 				<TouchableOpacity
-					onPress={() => navigation.navigate("VerificationCode")}
+					onPress={handleSignup}
 					style={sigupStyle.ClickSignup}>
 					<Text style={sigupStyle.textSignup}>Sign up</Text>
 				</TouchableOpacity>
