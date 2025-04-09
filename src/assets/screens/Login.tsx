@@ -16,13 +16,14 @@ import Modal from "react-native-modal";
 import { supabase } from "../config/Supabase/SupabaseClient";
 import signupStyle from "../style/signupStyle";
 import loginStyle from "../style/styleLogin";
+import { useAudio } from "../context/AudioContext"; // Import useAudio từ AudioContext
 
 type RootStackParamList = {
   Introduce: undefined;
   Signup: undefined;
   Login: undefined;
   VerificationCode: undefined;
-  MainTabs: undefined; // Sửa từ HomeScreen thành MainTabs
+  MainTabs: undefined;
   AuthCallback: { code?: string };
 };
 
@@ -33,6 +34,7 @@ interface LoginProps {
 }
 
 export default function Login({ navigation }: LoginProps) {
+  const { startMusicAfterLogin } = useAudio(); // Sử dụng startMusicAfterLogin từ AudioContext
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [backPressCount, setBackPressCount] = useState(0);
@@ -74,7 +76,8 @@ export default function Login({ navigation }: LoginProps) {
       setSession(session);
       if (session) {
         console.log("Phiên đăng nhập được tìm thấy khi tải ứng dụng:", session);
-        navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
+        startMusicAfterLogin(); // Phát nhạc nếu đã có phiên
+        navigation.replace("MainTabs");
       } else {
         console.log("Không tìm thấy phiên đăng nhập khi tải ứng dụng.");
       }
@@ -87,7 +90,8 @@ export default function Login({ navigation }: LoginProps) {
       setSession(session);
       if (event === "SIGNED_IN" && session) {
         console.log("Người dùng đăng nhập thành công:", session);
-        navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
+        startMusicAfterLogin(); // Phát nhạc khi đăng nhập
+        navigation.replace("MainTabs");
       } else if (event === "SIGNED_OUT") {
         console.log("Người dùng đã đăng xuất.");
       } else {
@@ -100,7 +104,8 @@ export default function Login({ navigation }: LoginProps) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           console.log("Phiên sau khi quay lại:", session);
-          navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
+          startMusicAfterLogin(); // Phát nhạc nếu có phiên khi quay lại
+          navigation.replace("MainTabs");
         }
       }
     };
@@ -110,7 +115,7 @@ export default function Login({ navigation }: LoginProps) {
       subscription?.unsubscribe();
       appStateSubscription.remove();
     };
-  }, [navigation]);
+  }, [navigation, startMusicAfterLogin]);
 
   const handleExit = () => {
     setModalVisible(false);
@@ -170,26 +175,26 @@ export default function Login({ navigation }: LoginProps) {
       }
 
       console.log("Đăng nhập thành công:", data);
+      startMusicAfterLogin(); // Phát nhạc khi đăng nhập thành công
     } catch (error) {
       console.error("Lỗi không xác định:", error);
       alert("Đã xảy ra lỗi. Vui lòng thử lại.");
     }
   };
 
-
   const handleTempLogin = () => {
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
-  
-    if (trimmedEmail === "admin" && trimmedPassword === "123") {
+
+    if (trimmedEmail === "a" && trimmedPassword === "1") {
       console.log("Đăng nhập tạm thành công");
+      startMusicAfterLogin(); // Phát nhạc khi đăng nhập thành công
       navigation.replace("MainTabs");
     } else {
       alert("Tài khoản hoặc mật khẩu không đúng.");
     }
   };
-  
-  
+
   return (
     <SafeAreaView style={loginStyle.container}>
       <ScrollView style={loginStyle.scrollView}>
@@ -233,7 +238,7 @@ export default function Login({ navigation }: LoginProps) {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleTempLogin } style={loginStyle.ClickLogin}>
+        <TouchableOpacity onPress={handleTempLogin} style={loginStyle.ClickLogin}>
           <Text style={loginStyle.textLogin}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
@@ -253,7 +258,7 @@ export default function Login({ navigation }: LoginProps) {
             resizeMode={"stretch"}
             style={loginStyle.sigintiktokIMG}
           />
-          <Text style={loginStyle.texttiktokSigin}>Sign in with TikTok</Text>
+          <Text style={loginStyle.texttiktokSigin}>Sign in with FaceBook</Text>
         </TouchableOpacity>
       </ScrollView>
 

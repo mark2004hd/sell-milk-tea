@@ -12,7 +12,6 @@ const loginStyle = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#FFFFFF",
 		paddingTop: height * 0.1, // 10% chiều cao thay vì 77 cố định
-		// Xóa position: "absolute" vì không cần thiết trong hầu hết trường hợp
 	},
 	header: {
 		color: "#191D31",
@@ -69,8 +68,9 @@ const loginStyle = StyleSheet.create({
 		backgroundColor: "#FBFBFD",
 		borderColor: "#F9F9F9",
 		borderRadius: 15,
-		borderWidth: 1,
+		borderWidth: 2, // Đồng bộ với ViewPassword
 		paddingHorizontal: width * 0.037, // ~14px
+		paddingVertical: height * 0.015, // ~11.25px, đồng bộ với ViewPassword
 		marginBottom: height * 0.033, // ~25px
 		marginHorizontal: width * 0.064, // ~24px
 	},
@@ -82,7 +82,7 @@ const loginStyle = StyleSheet.create({
 	textInputEmail: {
 		fontSize: width * 0.037, // ~14px
 		flex: 1,
-		paddingVertical: height * 0.02, // ~15px
+		// Xóa paddingVertical để đồng bộ với password
 	},
 	titlePassword: {
 		color: "#191D31",
@@ -97,10 +97,10 @@ const loginStyle = StyleSheet.create({
 		backgroundColor: "#FBFBFD",
 		borderColor: "#F9F9F9",
 		borderRadius: 15,
-		borderWidth: 1,
-		paddingVertical: height * 0.02, // ~15px
+		borderWidth: 2,
 		paddingHorizontal: width * 0.037, // ~14px
-		marginBottom: height * 0.066, // ~50px
+		paddingVertical: height * 0.015, // ~11.25px
+		marginBottom: height * 0.033, // ~25px
 		marginHorizontal: width * 0.064, // ~24px
 	},
 	password: {
@@ -136,7 +136,7 @@ const loginStyle = StyleSheet.create({
 		color: "#2E10F2",
 		fontSize: width * 0.037, // ~14px
 		marginBottom: height * 0.025, // ~19px
-		textAlign: "center", // Thay marginHorizontal cố định để căn giữa
+		textAlign: "center",
 	},
 	signinGG: {
 		flexDirection: "row",

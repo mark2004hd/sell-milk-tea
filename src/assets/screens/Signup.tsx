@@ -106,7 +106,7 @@ export default function Signup({ navigation }: LoginProps) {
 					</TouchableOpacity>
 				</View>
 				<TouchableOpacity
-					onPress={() => navigation.navigate("VerificationCode")}
+					onPress={() => navigation.navigate("Login")} //temp
 					style={sigupStyle.ClickSignup}>
 					<Text style={sigupStyle.textSignup}>Sign up</Text>
 				</TouchableOpacity>
