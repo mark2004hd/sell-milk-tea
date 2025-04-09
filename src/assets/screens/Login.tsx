@@ -1,6 +1,7 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   AppState, // Thêm AppState
   BackHandler,
   Image,
@@ -16,6 +17,7 @@ import Modal from "react-native-modal";
 import { supabase } from "../config/Supabase/SupabaseClient";
 import signupStyle from "../style/signupStyle";
 import loginStyle from "../style/styleLogin";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootStackParamList = {
   Introduce: undefined;
@@ -161,24 +163,40 @@ export default function Login({ navigation }: LoginProps) {
 
   const handleLogin = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
+      const response = await fetch("http://192.168.74.73:8080/zen8labs-system/auth/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+          email: email,
+        }),
       });
-
-      if (error) {
-        console.error("Lỗi đăng nhập:", error.message);
-        alert("Đăng nhập thất bại: " + error.message);
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+        Alert.alert("Login Failed", errorData.message || "Invalid credentials");
         return;
       }
-
-      console.log("Đăng nhập thành công:", data);
+  
+      const data = await response.json();
+      console.log("Login success:", data);
+  
+      // 👇 Lưu token vào AsyncStorage
+      // await AsyncStorage.setItem("accessToken", data.accessToken);
+  
+      // 👇 Điều hướng sang Home (giả sử bạn dùng navigation)
+     
+  
     } catch (error) {
-      console.error("Lỗi không xác định:", error);
-      alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+      console.error("Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
-
+  
   return (
     <SafeAreaView style={loginStyle.container}>
       <ScrollView style={loginStyle.scrollView}>
