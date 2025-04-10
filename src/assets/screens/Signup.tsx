@@ -2,6 +2,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useState } from "react";
 import { Alert, Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import sigupStyle from "../style/signupStyle";
+import { LOCAL_IPV4_ADDRESS } from "@env";
 type RootStackParamList = {
 	Signup: undefined;
 	Login: undefined; // Added Login route
@@ -47,7 +48,8 @@ export default function Signup({ navigation }: LoginProps) {
 		}
 
 		try {
-			const response = await fetch("http://192.168.74.73:8080/zen8labs-system/api/v1/users", {
+			
+			const response = await fetch(`http://${LOCAL_IPV4_ADDRESS}:8080/zen8labs-system/api/v1/users`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

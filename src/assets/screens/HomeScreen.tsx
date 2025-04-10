@@ -1,3 +1,4 @@
+import { LOCAL_IPV4_ADDRESS } from "@env";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,6 +9,8 @@ interface Promotion {
 	price: string;
 	image: string;
 	description: string;
+	tag:string;
+	tagColor:string
 }
 
 const bannerImages = [
@@ -18,54 +21,95 @@ const bannerImages = [
 	"https://raw.githubusercontent.com/mark2004hd/img-api/master/img/intro6.jpg",
 ];
 
-const promotions: Promotion[] = [
-	{
-		id: "1",
-		title: "Caramel Matcha Latte",
-		price: "3.45USD",
-		description: "CONTAINS CAFFEINE|MINTY FRESH",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-	},
-	{
-		id: "2",
-		title: "Strawberry Cheese",
-		price: "2.15USD",
-		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-	},
-	{
-		id: "3",
-		title: "Choco Mint Delight",
-		price: "4.32USD",
-		description: "RICH COCOA |COOLING MINT|SMOOTH TEXTURE",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-	},
-	{
-		id: "4",
-		title: "Green Apple Mojito",
-		price: "1.89USD",
-		description: "REFRESHING | HINT OF LIME | FRUITY BURST",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-	},
-	{
-		id: "5",
-		title: "Double Espresso Shot",
-		price: "2.75USD",
-		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-	},
-	{
-		id: "6",
-		title: "Tropical Fruit Yogurt",
-		price: "3.90USD",
-		description: "CREAMY YOGURT | MIXED TROPICAL FRUITS | CHILLED",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-	},
-];
+// const promotions: Promotion[] = [
+// 	{
+// 		id: "1",
+// 		title: "Caramel Matcha Latte",
+// 		price: "3.45USD",
+// 		description: "CONTAINS CAFFEINE|MINTY FRESH",
+// 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+// 	},
+// 	{
+// 		id: "2",
+// 		title: "Strawberry Cheese",
+// 		price: "2.15USD",
+// 		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
+// 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+// 	},
+// 	{
+// 		id: "3",
+// 		title: "Choco Mint Delight",
+// 		price: "4.32USD",
+// 		description: "RICH COCOA |COOLING MINT|SMOOTH TEXTURE",
+// 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+// 	},
+// 	{
+// 		id: "4",
+// 		title: "Green Apple Mojito",
+// 		price: "1.89USD",
+// 		description: "REFRESHING | HINT OF LIME | FRUITY BURST",
+// 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+// 	},
+// 	{
+// 		id: "5",
+// 		title: "Double Espresso Shot",
+// 		price: "2.75USD",
+// 		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
+// 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+// 	},
+// 	{
+// 		id: "6",
+// 		title: "Tropical Fruit Yogurt",
+// 		price: "3.90USD",
+// 		description: "CREAMY YOGURT | MIXED TROPICAL FRUITS | CHILLED",
+// 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
+// 	},
+// ];
+
 
 const HomeScreen = () => {
+	const [promotions, setPromotions] = useState<Promotion[]>([])
 	const [currentBanner, setCurrentBanner] = useState(0);
 	const flatListRef = useRef<FlatList>(null);
+
+	useEffect(() => {
+		const fetchPromotions = async () => {
+			try {
+				const response = await fetch(`http://${LOCAL_IPV4_ADDRESS}/zen8labs-system/api/tea`, {
+					method: "POST",
+					headers: {
+					  "Content-Type": "application/json",
+					},
+				  });
+				  
+				 
+				  console.log("Raw text:", response);
+				  const text = await response.text();
+				  console.log("Raw text:", text);
+				
+				  const data = JSON.parse(text); // ép parse JSON
+				  console.log("Parsed JSON:", data);
+				  
+				  const formattedData: Promotion[] = data.map((item: any) => ({
+					id: item.id?.toString() ?? Math.random().toString(),
+					title: item.title ?? "No Title",
+					price: item.price ? `${item.price} USD` : "0.00 USD",
+					description: item.description ?? "No description",
+					image: item.image ?? "https://via.placeholder.com/150",
+					tag : item.tag,
+					tagColor : item.tagColor
+				  }));
+				  
+				  setPromotions(formattedData);
+				  
+			} catch (error) {
+				console.error("Failed to fetch promotions:", error);
+			}
+		};
+
+		fetchPromotions();
+	}, []);
+
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -121,9 +165,9 @@ const HomeScreen = () => {
 										event.nativeEvent.contentOffset.x;
 									const index = Math.round(
 										contentOffsetX /
-											(Dimensions.get("window")
-												.width -
-												32),
+										(Dimensions.get("window")
+											.width -
+											32),
 									);
 									setCurrentBanner(index);
 								}}
@@ -148,7 +192,7 @@ const HomeScreen = () => {
 											{
 												backgroundColor:
 													currentBanner ===
-													index
+														index
 														? "#8B4513"
 														: "#ccc",
 											},

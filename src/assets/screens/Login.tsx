@@ -17,6 +17,7 @@ import Modal from "react-native-modal";
 import { supabase } from "../config/Supabase/SupabaseClient";
 import signupStyle from "../style/signupStyle";
 import loginStyle from "../style/styleLogin";
+import { LOCAL_IPV4_ADDRESS } from "@env";
 
 type RootStackParamList = {
   Introduce: undefined;
@@ -34,8 +35,8 @@ interface LoginProps {
 }
 
 export default function Login({ navigation }: LoginProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("dotuan");
+  const [password, setPassword] = useState("112233");
   const [backPressCount, setBackPressCount] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -172,7 +173,7 @@ export default function Login({ navigation }: LoginProps) {
   };
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://192.168.74.73:8080/zen8labs-system/auth/token", {
+      const response = await fetch(`http://${LOCAL_IPV4_ADDRESS}/zen8labs-system/auth/token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
