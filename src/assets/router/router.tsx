@@ -4,6 +4,7 @@ import React from "react";
 
 import Introduce from "../screens/Introduce";
 import Login from "../screens/Login";
+import Search from "../screens/Search";
 import Signup from "../screens/Signup";
 import VerificationCode from "../screens/VerificationCode";
 import MainTabs from "./MainTabs";
@@ -14,6 +15,7 @@ type RootStackParamList = {
 	Login: undefined;
 	VerificationCode: undefined;
 	MainTabs: undefined;
+	Search: undefined;
 	AuthCallback: { code?: string };
 };
 
@@ -42,7 +44,8 @@ const Router = () => {
 				<Stack.Screen name="Login" component={Login} />
 				<Stack.Screen name="VerificationCode" component={VerificationCode} />
 				<Stack.Screen name="MainTabs" component={MainTabs} />
-			</Stack.Navigator>
+				<Stack.Screen name="Search" component={Search} />
+			</Stack.Navigator>	
 		</NavigationContainer>
 	);
 };

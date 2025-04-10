@@ -181,7 +181,7 @@ export default function Login({ navigation }: LoginProps) {
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
   
-    if (trimmedEmail === "admin" && trimmedPassword === "123") {
+    if (trimmedEmail === "a" && trimmedPassword === "1") {
       console.log("Đăng nhập tạm thành công");
       navigation.replace("MainTabs");
     } else {
