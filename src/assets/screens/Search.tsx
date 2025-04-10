@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Thêm import AsyncStorage
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	FlatList,
 	Image,
@@ -13,7 +14,7 @@ import {
 	View,
 } from "react-native";
 
-// Dữ liệu giả cho Hottest Searches
+// Dữ liệu giả cho Hottest Searches (giữ nguyên như bạn đã cung cấp)
 const hottestSearches = [
 	{
 		id: "841230",
@@ -201,16 +202,45 @@ const Search = () => {
 	const navigation = useNavigation();
 	const [searchText, setSearchText] = useState("");
 	const [recent, setRecent] = useState<string[]>([]); // Khởi tạo recentSearches rỗng
-	const [filteredHottestSearches, setFilteredHottestSearches] = useState(hottestSearches); // Danh sách đã lọc
+	const [filteredHottestSearches, setFilteredHottestSearches] = useState(hottestSearches);
+
+	// Hàm để lưu lịch sử tìm kiếm vào AsyncStorage
+	const saveRecentSearches = async (searches: string[]) => {
+		try {
+			await AsyncStorage.setItem("recentSearches", JSON.stringify(searches));
+		} catch (error) {
+			console.log("Error saving recent searches:", error);
+		}
+	};
+
+	// Hàm để lấy lịch sử tìm kiếm từ AsyncStorage
+	const loadRecentSearches = async () => {
+		try {
+			const storedSearches = await AsyncStorage.getItem("recentSearches");
+			if (storedSearches) {
+				setRecent(JSON.parse(storedSearches));
+			}
+		} catch (error) {
+			console.log("Error loading recent searches:", error);
+		}
+	};
+
+	// Tải lịch sử tìm kiếm khi component được mount
+	useEffect(() => {
+		loadRecentSearches();
+	}, []);
 
 	// Hàm xử lý tìm kiếm
 	const handleSearch = () => {
 		if (searchText.trim() === "") return; // Không lưu nếu từ khóa rỗng
 
-		// Lưu từ khóa tìm kiếm vào recentSearches (nếu chưa tồn tại)
-		if (!recent.includes(searchText)) {
-			setRecent([searchText, ...recent]); // Thêm từ khóa mới vào đầu danh sách
-		}
+		// Cập nhật danh sách recentSearches
+		const updatedRecent = recent.includes(searchText)
+			? recent // Không thêm nếu từ khóa đã tồn tại
+			: [searchText, ...recent.slice(0, 9)]; // Giới hạn 10 mục, thêm vào đầu danh sách
+
+		setRecent(updatedRecent);
+		saveRecentSearches(updatedRecent); // Lưu vào AsyncStorage
 
 		// Lọc danh sách hottestSearches dựa trên từ khóa
 		const filtered = hottestSearches.filter(
@@ -231,12 +261,15 @@ const Search = () => {
 
 	// Xóa một mục trong Recent Searches
 	const removeRecentSearch = (item: string) => {
-		setRecent(recent.filter((search) => search !== item));
+		const updatedRecent = recent.filter((search) => search !== item);
+		setRecent(updatedRecent);
+		saveRecentSearches(updatedRecent); // Cập nhật AsyncStorage
 	};
 
 	// Xóa toàn bộ Recent Searches
 	const clearAllRecentSearches = () => {
 		setRecent([]);
+		saveRecentSearches([]); // Xóa trong AsyncStorage
 	};
 
 	// Render mỗi mục trong Recent Searches
@@ -276,8 +309,8 @@ const Search = () => {
 					value={searchText}
 					onChangeText={setSearchText}
 					placeholderTextColor="#888"
-					onSubmitEditing={handleSubmitEditing} // Xử lý khi nhấn Enter
-					returnKeyType="search" // Hiển thị nút "Search" trên bàn phím
+					onSubmitEditing={handleSubmitEditing}
+					returnKeyType="search"
 				/>
 				<TouchableOpacity onPress={handleSearch} style={styles.searchButton}></TouchableOpacity>
 			</View>
