@@ -27,9 +27,18 @@ const stores = [
     image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
   },
 ];
-
+interface Promotion {
+  id: string;
+  title: string;
+  price: string;
+  image: string;
+  description: string;
+  tag?: string;
+  tagColor?: string;
+  product?: string;
+}
 // Dữ liệu sản phẩm
-const hottestSearches = [
+const promotions: Promotion[] = [
   {
     id: "1",
     title: "Caramel Matcha",
@@ -226,7 +235,7 @@ const Search = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
-  const [filteredHottestSearches, setFilteredHottestSearches] = useState(hottestSearches);
+  const [filteredpromotions, setFilteredpromotions] = useState(promotions);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string | null>(null); // Thêm trạng thái để theo dõi tab được chọn
@@ -267,14 +276,14 @@ const Search = () => {
 
   /**
    * Tạo gợi ý tìm kiếm dựa trên đầu vào của người dùng
-   * Lọc dữ liệu hottestSearches và giới hạn ở 5 gợi ý
+   * Lọc dữ liệu promotions và giới hạn ở 5 gợi ý
    */
   const suggestionsData = useMemo(() => {
     if (!searchText.trim() || hasSearched) {
       return [];
     }
     const queryLower = searchText.toLowerCase();
-    return hottestSearches
+    return promotions
       .filter((item) => {
         const priceWithoutUSD = item.price.replace("USD", "").trim();
         return (
@@ -294,11 +303,11 @@ const Search = () => {
     setSuggestions(suggestionsData);
 
     if (!searchText.trim()) {
-      setFilteredHottestSearches(hottestSearches);
+      setFilteredpromotions(promotions);
       setHasSearched(false);
     } else {
       const queryLower = searchText.toLowerCase();
-      const filtered = hottestSearches
+      const filtered = promotions
         .filter((item) => {
           const priceWithoutUSD = item.price.replace("USD", "").trim();
           return (
@@ -309,7 +318,7 @@ const Search = () => {
           );
         })
         .slice(0, 10);
-      setFilteredHottestSearches(filtered);
+      setFilteredpromotions(filtered);
     }
   }, [searchText, suggestionsData]);
 
@@ -321,7 +330,7 @@ const Search = () => {
   const performSearch = useCallback(
     (query: string) => {
       if (!query.trim()) {
-        setFilteredHottestSearches(hottestSearches);
+        setFilteredpromotions(promotions);
         setSearchText("");
         setSuggestions([]);
         setHasSearched(false);
@@ -333,7 +342,7 @@ const Search = () => {
       setRecent(updatedRecent);
       saveRecentSearches(updatedRecent);
 
-      const filtered = hottestSearches
+      const filtered = promotions
         .filter((item) => {
           const queryLower = query.toLowerCase();
           const priceWithoutUSD = item.price.replace("USD", "").trim();
@@ -345,7 +354,7 @@ const Search = () => {
           );
         })
         .slice(0, 10);
-      setFilteredHottestSearches(filtered);
+      setFilteredpromotions(filtered);
 
       setSearchText(query);
       setSuggestions([]);
@@ -543,11 +552,11 @@ const Search = () => {
 
   /**
    * Giới hạn số lượng sản phẩm hiển thị (8 sản phẩm)
-   * @returns Dữ liệu hottestSearches đã được lọc
+   * @returns Dữ liệu promotions đã được lọc
    */
-  const hottestSearchesData = useMemo(() => {
-    return filteredHottestSearches.slice(0, 8);
-  }, [filteredHottestSearches]);
+  const promotionsData = useMemo(() => {
+    return filteredpromotions.slice(0, 8);
+  }, [filteredpromotions]);
 
   // Giao diện chính của component
   return (
@@ -617,9 +626,9 @@ const Search = () => {
                 scrollEnabled={false}
               />
               {/* Hiển thị kết quả sản phẩm dạng lưới khi đang tìm kiếm */}
-              {hottestSearchesData.length > 0 ? (
+              {promotionsData.length > 0 ? (
                 <FlatList
-                  data={hottestSearchesData}
+                  data={promotionsData}
                   renderItem={renderHottestSearchGrid}
                   keyExtractor={(item) => item.id}
                   numColumns={2}
@@ -639,9 +648,9 @@ const Search = () => {
             <>
               {/* Hiển thị "Tìm kiếm nổi bật" khi chưa nhập tìm kiếm */}
               <Text style={styles.sectionTitle}>Tìm kiếm nổi bật</Text>
-              {hottestSearchesData.length > 0 ? (
+              {promotionsData.length > 0 ? (
                 <FlatList
-                  data={hottestSearchesData}
+                  data={promotionsData}
                   renderItem={renderHottestSearchDefault}
                   keyExtractor={(item) => item.id}
                   numColumns={1}

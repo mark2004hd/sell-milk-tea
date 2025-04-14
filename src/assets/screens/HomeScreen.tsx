@@ -50,7 +50,7 @@ const HomeScreen = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const flatListRef = useRef<FlatList>(null);
 
-  // fetching api for Promotion
+  // Fetch promotions từ API
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
@@ -68,6 +68,7 @@ const HomeScreen = () => {
     fetchPromotions();
   }, []);
 
+  // Banner carousel
   useEffect(() => {
     const interval = setInterval(() => {
       const nextIndex = (currentBanner + 1) % bannerImages.length;
@@ -78,6 +79,7 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [currentBanner]);
 
+  // Xử lý nút back
   useEffect(() => {
     const handleBackPress = () => {
       if (!isFocused) {
@@ -111,6 +113,11 @@ const HomeScreen = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setSwipeCount(0);
+  };
+
+  // Điều hướng đến Search với promotions
+  const goToSearch = () => {
+    navigation.navigate("Search", { promotions });
   };
 
   const renderPromotionItem = ({ item }: { item: Promotion }) => (
@@ -205,7 +212,7 @@ const HomeScreen = () => {
             <View style={styles.promotionsContainer}>
               <View style={styles.promotionsHeader}>
                 <Text style={styles.sectionTitle}>LATEST PROMOTIONS</Text>
-                <TouchableOpacity style={styles.viewMoreButton}>
+                <TouchableOpacity style={styles.viewMoreButton} >
                   <Text style={styles.viewMoreText}>VIEW MORE</Text>
                 </TouchableOpacity>
               </View>
