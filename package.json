@@ -22,6 +22,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@supabase/realtime-js": "^2.11.5",
     "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.8.4",
     "expo": "~52.0.23",
     "expo-auth-session": "^6.0.3",
     "expo-av": "~15.0.2",

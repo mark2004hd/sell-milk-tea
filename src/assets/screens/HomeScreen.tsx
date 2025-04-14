@@ -1,9 +1,19 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useRef, useState } from "react";
-import { BackHandler, Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  BackHandler,
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Modal from "react-native-modal";
 import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
 
 type RootStackParamList = {
   Home: undefined;
@@ -31,226 +41,32 @@ const bannerImages = [
   "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/intro6.jpg",
 ];
 
-const promotions: Promotion[] = [
-	{
-		id: "1",
-		title: "Caramel Matcha",
-		price: "3.75USD",
-		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A sweet and creamy matcha drink topped with cheese foam. Perfect for a cozy afternoon.",
-	},
-	{
-		id: "2",
-		title: "Berry Bliss",
-		price: "2.50USD",
-		description: "COOL & SMOOTH | CHOCOLATE DELIGHT",
-		image: "https://cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/67fbda4a0025f51ed3cf/view?project=67ed5f5e00176f489872&mode=admin",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A refreshing berry-based drink with a smooth chocolate twist. Enjoy the best of both worlds.",
-	},
-	{
-		id: "3",
-		title: "Tropical Yogurt",
-		price: "3.90USD",
-		description: "CREAMY YOGURT | MIXED TROPICAL FRUITS | CHILLED",
-		image: "https://cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/1/view?project=67ed5f5e00176f489872&mode=admin",
-		tag: "Seasonal",
-		tagColor: "#32CD32",
-		product: "A creamy yogurt blended with tropical fruits, perfect for a refreshing and cooling treat.",
-	},
-	{
-		id: "4",
-		title: "Mocha Thunder",
-		price: "2.95USD",
-		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
-		image: "https://cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/67fbda8a0003883d0016/view?project=67ed5f5e00176f489872&mode=admin",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A bold mocha coffee with a thunderous caffeine kick. Perfect for those needing an energy boost.",
-	},
-	{
-		id: "5",
-		title: "Peach Tea",
-		price: "2.30USD",
-		description: "FRUITY & TANGY | SUMMER VIBES",
-		image: "https://cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/67fbda56000979606ad6/view?project=67ed5f5e00176f489872&mode=admin",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A refreshing peach tea, tangy and light, perfect for a summer day.",
-	},
-	{
-		id: "6",
-		title: "Mocha Thunder",
-		price: "2.95USD",
-		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A strong mocha flavor with an intense caffeine punch. Ideal for mocha lovers.",
-	},
-	{
-		id: "7",
-		title: "Peach Tea",
-		price: "2.30USD",
-		description: "FRUITY & TANGY | SUMMER VIBES",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A fruity peach tea with a tangy twist. Perfect for any time of the day.",
-	},
-	{
-		id: "8",
-		title: "Lychee Fizz",
-		price: "3.10USD",
-		description: "REFRESHING | HINT OF LIME | FRUITY BURST",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Seasonal",
-		tagColor: "#32CD32",
-		product: "A refreshing lychee drink with a hint of lime, bursting with fruity flavors.",
-	},
-	{
-		id: "9",
-		title: "Choco Mint",
-		price: "3.65USD",
-		description: "COOL & SMOOTH | CHOCOLATE DELIGHT",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A cool and smooth chocolate drink with a refreshing minty twist.",
-	},
-	{
-		id: "10",
-		title: "Strawberry Cheese",
-		price: "2.45USD",
-		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A sweet strawberry treat topped with creamy cheese foam.",
-	},
-	{
-		id: "11",
-		title: "Matcha Smoothie",
-		price: "3.55USD",
-		description: "COOL & SMOOTH | CHOCOLATE DELIGHT",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Seasonal",
-		tagColor: "#32CD32",
-		product: "A cool and smooth matcha smoothie for a delightful experience.",
-	},
-	{
-		id: "12",
-		title: "Coconut Latte",
-		price: "3.20USD",
-		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A rich coconut latte with a bold flavor and high caffeine content.",
-	},
-	{
-		id: "13",
-		title: "Green Apple Mojito",
-		price: "1.89USD",
-		description: "REFRESHING | HINT OF LIME | FRUITY BURST",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A zesty green apple mojito with a hint of lime, perfect for a refreshing burst.",
-	},
-	{
-		id: "14",
-		title: "Vanilla Cloud",
-		price: "2.90USD",
-		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Seasonal",
-		tagColor: "#32CD32",
-		product: "A smooth and creamy vanilla drink topped with delicious cheese foam.",
-	},
-	{
-		id: "15",
-		title: "Rose Latte",
-		price: "3.70USD",
-		description: "FRUITY & TANGY | SUMMER VIBES",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A fragrant rose latte with fruity and tangy notes for a refreshing twist.",
-	},
-	{
-		id: "16",
-		title: "Banana Brew",
-		price: "2.85USD",
-		description: "CREAMY YOGURT | MIXED TROPICAL FRUITS | CHILLED",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A tropical brew with creamy yogurt and mixed fruits for a chilled delight.",
-	},
-	{
-		id: "17",
-		title: "Pineapple Punch",
-		price: "3.25USD",
-		description: "FRUITY & TANGY | SUMMER VIBES",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Seasonal",
-		tagColor: "#32CD32",
-		product: "A tangy pineapple punch, perfect for a vibrant summer experience.",
-	},
-	{
-		id: "18",
-		title: "Double Espresso",
-		price: "2.75USD",
-		description: "STRONG & BOLD | HIGH CAFFEINE | INTENSE FLAVOR",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A strong double espresso to keep you energized throughout the day.",
-	},
-	{
-		id: "19",
-		title: "Lavender Dream",
-		price: "3.60USD",
-		description: "COOL & SMOOTH | CHOCOLATE DELIGHT",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "New",
-		tagColor: "#FF8C00",
-		product: "A smooth lavender drink with a chocolatey touch for a dreamy experience.",
-	},
-	{
-		id: "20",
-		title: "Oreo Milkshake",
-		price: "3.80USD",
-		description: "SWEET & CREAMY|TOPPED WITH CHEESE FOAM",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Seasonal",
-		tagColor: "#32CD32",
-		product: "A sweet and creamy Oreo milkshake topped with a delightful cheese foam.",
-	},
-	{
-		id: "21",
-		title: "Mango Tango",
-		price: "2.95USD",
-		description: "REFRESHING | HINT OF LIME | FRUITY BURST",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/coffee/RiceMochi.png",
-		tag: "Hot",
-		tagColor: "#FF6347",
-		product: "A refreshing mango drink with a hint of lime, perfect for a tropical burst.",
-	},
-];
-
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const isFocused = useIsFocused();
   const [currentBanner, setCurrentBanner] = useState(0);
   const [swipeCount, setSwipeCount] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const flatListRef = useRef<FlatList>(null);
+
+  // fetching api for Promotion
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      try {
+        const response = await axios.get(
+          "https://run.mocky.io/v3/c9cb4525-7ad7-4fdf-9dc8-8153b515ed25"
+        );
+        if (response.data.Response === "True") {
+          setPromotions(response.data.Promotion);
+        }
+      } catch (error) {
+        console.error("Error fetching promotions:", error);
+      }
+    };
+
+    fetchPromotions();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -280,7 +96,10 @@ const HomeScreen = () => {
       return false;
     };
 
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress
+    );
     return () => backHandler.remove();
   }, [swipeCount, isFocused]);
 
@@ -295,11 +114,16 @@ const HomeScreen = () => {
   };
 
   const renderPromotionItem = ({ item }: { item: Promotion }) => (
-    <TouchableOpacity style={styles.promotionCard} onPress={() => console.log(`Pressed on ${item.title}`)}>
+    <TouchableOpacity
+      style={styles.promotionCard}
+      onPress={() => console.log(`Pressed on ${item.title}`)}
+    >
       <Image
         source={{ uri: item.image }}
         style={styles.promotionImage}
-        onError={(error) => console.log("Image load error:", error.nativeEvent)}
+        onError={(error) =>
+          console.log("Image load error:", error.nativeEvent)
+        }
       />
       <Text style={styles.promotionTitle}>{item.title}</Text>
       <Text style={styles.promotionDescription}>{item.description}</Text>
@@ -308,7 +132,10 @@ const HomeScreen = () => {
   );
 
   const renderBannerItem = ({ item }: { item: string }) => (
-    <TouchableOpacity style={styles.banner} onPress={() => setSwipeCount((prev) => prev + 1)}>
+    <TouchableOpacity
+      style={styles.banner}
+      onPress={() => setSwipeCount((prev) => prev + 1)}
+    >
       <Image source={{ uri: item }} style={styles.bannerImage} />
       <Text style={styles.bannerText}></Text>
     </TouchableOpacity>
@@ -334,13 +161,18 @@ const HomeScreen = () => {
                 snapToAlignment="center"
                 onScroll={(event) => {
                   const contentOffsetX = event.nativeEvent.contentOffset.x;
-                  const index = Math.round(contentOffsetX / (Dimensions.get("window").width - 32));
+                  const index = Math.round(
+                    contentOffsetX / (Dimensions.get("window").width - 32)
+                  );
                   setCurrentBanner(index);
                 }}
                 onScrollToIndexFailed={(info) => {
                   const wait = new Promise((resolve) => setTimeout(resolve, 100));
                   wait.then(() => {
-                    flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+                    flatListRef.current?.scrollToIndex({
+                      index: info.index,
+                      animated: true,
+                    });
                   });
                 }}
               />
@@ -348,11 +180,24 @@ const HomeScreen = () => {
                 {[0, 1, 2].map((index) => (
                   <View
                     key={index}
-                    style={[styles.dot, { backgroundColor: currentBanner === index ? "#8B4513" : "#ccc" }]}
+                    style={[
+                      styles.dot,
+                      {
+                        backgroundColor:
+                          currentBanner === index ? "#8B4513" : "#ccc",
+                      },
+                    ]}
                   />
                 ))}
                 <View
-                  style={[styles.dot, styles.halfDot, { backgroundColor: currentBanner >= 3 ? "#8B4513" : "#ccc" }]}
+                  style={[
+                    styles.dot,
+                    styles.halfDot,
+                    {
+                      backgroundColor:
+                        currentBanner >= 3 ? "#8B4513" : "#ccc",
+                    },
+                  ]}
                 />
               </View>
             </View>
@@ -389,9 +234,14 @@ const HomeScreen = () => {
       >
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Thoát ứng dụng</Text>
-          <Text style={styles.modalMessage}>Bạn có chắc chắn muốn thoát không?</Text>
+          <Text style={styles.modalMessage}>
+            Bạn có chắc chắn muốn thoát không?
+          </Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
+            <TouchableOpacity
+              onPress={handleCancel}
+              style={styles.cancelButton}
+            >
               <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleExit} style={styles.exitButton}>
