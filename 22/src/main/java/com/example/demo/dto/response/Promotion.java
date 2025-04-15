@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Promotion {
+    private String id;
     private String image;
     private String product;
     private String tagColor;

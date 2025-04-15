@@ -27,6 +27,7 @@ public class TeaService {
                     String imageUrl = image != null ? image.getImageData() : "";
 
                     return new Promotion(
+                            p.getId(),
                             imageUrl,
                             p.getProduct(),            // product
                             p.getTagColor(),              // tagColor - giả sử hardcoded
