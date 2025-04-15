@@ -25,11 +25,24 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		const fetchPromotions = async () => {
 			try {
-				const response = await axios.get(
-					"http://192.168.0.101:8080/api/promotions"
-				);
-				if (response.data.Response === "True") {
-					setPromotions(response.data.Promotion);
+				const response = await fetch("http://192.168.0.101:8080/zen8labs-system/api/tea", {
+					method: "POST", // <-- đổi sang POST
+					headers: {
+						"Accept": "application/json",
+						"Content-Type": "application/json" // <-- thêm nếu cần
+					}
+				});
+
+				// const data = await response.json();
+				console.log("Response from server:", response);
+				const text = await response.text(); // <-- đọc raw text
+				console.log("Raw response text:", text);
+				const data = JSON.parse(text); // <-- ép kiểu JSON
+			console.log("Parsed JSON:", data);
+				if (data.response === "Success") {
+					setPromotions(data.promotion);
+				} else {
+					console.log("Server responded but not success:", data);
 				}
 			} catch (error) {
 				console.error("Error fetching promotions:", error);
@@ -38,6 +51,8 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 
 		fetchPromotions();
 	}, []);
+
+
 
 	return (
 		<PromotionsContext.Provider value={{ promotions, setPromotions }}>
