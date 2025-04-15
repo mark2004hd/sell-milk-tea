@@ -90,7 +90,7 @@ const MainTabs = () => {
     <SafeAreaView style={styles.container}>
       {currentTab === "HomeTab" && (
         <View style={styles.headerContainer}>
-          <Header promotions={promotions} />
+          <Header />
         </View>
       )}
       <BottomTab.Navigator

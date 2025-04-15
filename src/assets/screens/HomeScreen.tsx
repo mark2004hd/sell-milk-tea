@@ -1,6 +1,7 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useRef, useState } from "react";
+import { usePromotions } from "../context/PromotionsContext";
 import {
   BackHandler,
   Dimensions,
@@ -47,26 +48,9 @@ const HomeScreen = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
   const [swipeCount, setSwipeCount] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const { promotions } = usePromotions();
   const flatListRef = useRef<FlatList>(null);
 
-  // Fetch promotions từ API
-  useEffect(() => {
-    const fetchPromotions = async () => {
-      try {
-        const response = await axios.get(
-          "http://192.168.37.108:8080/api/promotions"
-        );
-        if (response.data.Response === "True") {
-          setPromotions(response.data.Promotion);
-        }
-      } catch (error) {
-        console.error("Error fetching promotions:", error);
-      }
-    };
-
-    fetchPromotions();
-  }, []);
 
   // Banner carousel
   useEffect(() => {

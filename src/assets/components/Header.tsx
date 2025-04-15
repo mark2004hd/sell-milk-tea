@@ -4,10 +4,10 @@ import Icon from "react-native-vector-icons/Feather";
 import Profile from "./Profile";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-
+import { usePromotions } from "../context/PromotionsContext";
 type RootStackParamList = {
   Home: undefined;
-  Search: { promotions: Promotion[] };
+  Search: undefined;
   Category: undefined;
 };
 
@@ -29,9 +29,11 @@ interface Notification {
   isRead: boolean;
 }
 
-const Header = ({ promotions }: { promotions: Promotion[] }) => {
+const Header = () => {
   const navigation = useNavigation<NavigationProp>();
+
   const isFocused = useIsFocused();
+  const { promotions } = usePromotions();
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     { id: "1", message: "You have a new order!", isRead: false },
@@ -60,7 +62,8 @@ const Header = ({ promotions }: { promotions: Promotion[] }) => {
   }, [isFocused]);
 
   const handleSearchPress = () => {
-    navigation.navigate("Search", { promotions: promotions || [] });
+    navigation.navigate("Search"); // ✅ Không báo lỗi nữa
+
   };
 
   const handleNotificationPress = () => {
@@ -259,4 +262,4 @@ export const headerstyle = StyleSheet.create({
   },
 });
 
-export default Header;
+export default Header
