@@ -1,0 +1,17 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /zen8labs-system
+
+jwt:
+  signerKey: "1lD9fsDTGBoeO+PtSfpBlE87zHJSoGWb1g3ptVl7qlfPEXCdXAw1NjhDlELjTIEX"
+  valid-duration: 3600  # in second
+  refreshable-duration: 360000  # in seconds
+
+open:
+  api:
+    title: API document
+    version: 1.0.0
+    description: Banking System
+    serverUrl: http://localhost:8080/zen8labs-system
+    serverName: Server Test
