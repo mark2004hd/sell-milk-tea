@@ -26,7 +26,7 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 		const fetchPromotions = async () => {
 			try {
 				const response = await axios.get(
-					"http://192.168.37.108:8080/api/promotions"
+					"http://192.168.0.101:8080/api/promotions"
 				);
 				if (response.data.Response === "True") {
 					setPromotions(response.data.Promotion);
