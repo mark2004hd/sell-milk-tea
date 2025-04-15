@@ -9,6 +9,7 @@ import Signup from "../screens/Signup";
 import VerificationCode from "../screens/VerificationCode";
 import MainTabs from "./MainTabs";
 import { AudioProvider } from "../context/AudioContext"; // Đảm bảo import đúng từ thư mục context
+import { PromotionsProvider } from "../context/PromotionsContext";
 
 type RootStackParamList = {
   Introduce: undefined;
@@ -18,6 +19,7 @@ type RootStackParamList = {
   MainTabs: undefined;
   Search: undefined;
   AuthCallback: { code?: string };
+  
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -39,6 +41,7 @@ const linking = {
 const Router = () => {
   return (
     <AudioProvider>
+      <PromotionsProvider>
       <NavigationContainer linking={linking}>
         <Stack.Navigator initialRouteName="Introduce" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Introduce" component={Introduce} />
@@ -49,6 +52,8 @@ const Router = () => {
           <Stack.Screen name="Search" component={Search} />
         </Stack.Navigator>
       </NavigationContainer>
+       </PromotionsProvider>
+     
     </AudioProvider>
   );
 };

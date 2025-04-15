@@ -8,15 +8,26 @@ import Header from "../components/Header";
 import Category from "../screens/Category";
 import HomeScreen from "../screens/HomeScreen";
 
+interface Promotion {
+  id: string;
+  title: string;
+  price: string;
+  image: string;
+  description: string;
+  tag?: string;
+  tagColor?: string;
+  product?: string;
+}
+
 const MyOrdersScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Màn hình Đơn hàng của tôi</Text>
+    <Text style={styles.placeholderText}>Order</Text>
   </View>
 );
 
 const FavoritesScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Màn hình Yêu thích</Text>
+    <Text style={styles.placeholderText}>Favorites</Text>
   </View>
 );
 
@@ -31,7 +42,7 @@ const isTablet = width > 768;
 
 const TopTab = createMaterialTopTabNavigator();
 
-const TopTabs = () => {
+const TopTabs = ({ promotions }: { promotions: Promotion[] }) => {
   return (
     <TopTab.Navigator
       initialRouteName="Home"
@@ -57,7 +68,7 @@ const TopTabs = () => {
     >
       <TopTab.Screen
         name="Home"
-        component={HomeScreen}
+        component={() => <HomeScreen />}
         options={{ tabBarStyle: { backgroundColor: "#fff" } }}
       />
       <TopTab.Screen
@@ -73,12 +84,13 @@ const BottomTab = createBottomTabNavigator();
 
 const MainTabs = () => {
   const [currentTab, setCurrentTab] = useState("HomeTab");
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   return (
     <SafeAreaView style={styles.container}>
       {currentTab === "HomeTab" && (
         <View style={styles.headerContainer}>
-          <Header promotions={[]} />
+          <Header promotions={promotions} />
         </View>
       )}
       <BottomTab.Navigator
@@ -116,7 +128,7 @@ const MainTabs = () => {
       >
         <BottomTab.Screen
           name="HomeTab"
-          component={TopTabs}
+          component={() => <TopTabs promotions={promotions} />}
           options={{
             title: "Home",
             headerShown: false,

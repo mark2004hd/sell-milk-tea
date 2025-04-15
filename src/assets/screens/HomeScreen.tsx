@@ -55,7 +55,7 @@ const HomeScreen = () => {
     const fetchPromotions = async () => {
       try {
         const response = await axios.get(
-          "https://run.mocky.io/v3/c9cb4525-7ad7-4fdf-9dc8-8153b515ed25"
+          "http://192.168.37.108:8080/api/promotions"
         );
         if (response.data.Response === "True") {
           setPromotions(response.data.Promotion);
@@ -116,9 +116,7 @@ const HomeScreen = () => {
   };
 
   // Điều hướng đến Search với promotions
-  const goToSearch = () => {
-    navigation.navigate("Search", { promotions });
-  };
+ 
 
   const renderPromotionItem = ({ item }: { item: Promotion }) => (
     <TouchableOpacity
