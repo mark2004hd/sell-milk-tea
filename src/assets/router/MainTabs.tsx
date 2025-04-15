@@ -11,7 +11,7 @@ import HomeScreen from "../screens/HomeScreen";
 interface Promotion {
   id: string;
   title: string;
-  price: string;
+  price: number; // Đổi sang number
   image: string;
   description: string;
   tag?: string;
@@ -21,24 +21,27 @@ interface Promotion {
 
 const MyOrdersScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Order</Text>
+    <Text style={styles.placeholderText}>Đơn hàng</Text>
   </View>
 );
 
 const FavoritesScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Favorites</Text>
+    <Text style={styles.placeholderText}>Yêu thích</Text>
   </View>
 );
 
 const ProfileScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Màn hình Hồ sơ</Text>
+    <Text style={styles.placeholderText}>Hồ sơ</Text>
   </View>
 );
 
 const { width, height } = Dimensions.get("window");
 const isTablet = width > 768;
+
+// Thành phần tĩnh để tránh cảnh báo inline function
+const HomeScreenComponent = () => <HomeScreen />;
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -68,7 +71,7 @@ const TopTabs = ({ promotions }: { promotions: Promotion[] }) => {
     >
       <TopTab.Screen
         name="Home"
-        component={() => <HomeScreen />}
+        component={HomeScreenComponent}
         options={{ tabBarStyle: { backgroundColor: "#fff" } }}
       />
       <TopTab.Screen
@@ -79,6 +82,11 @@ const TopTabs = ({ promotions }: { promotions: Promotion[] }) => {
     </TopTab.Navigator>
   );
 };
+
+// Thành phần tĩnh cho HomeTab
+const HomeTabComponent = ({ promotions }: { promotions: Promotion[] }) => (
+  <TopTabs promotions={promotions} />
+);
 
 const BottomTab = createBottomTabNavigator();
 
@@ -128,9 +136,9 @@ const MainTabs = () => {
       >
         <BottomTab.Screen
           name="HomeTab"
-          component={() => <TopTabs promotions={promotions} />}
+          component={() => <HomeTabComponent promotions={promotions} />}
           options={{
-            title: "Home",
+            title: "Trang chủ",
             headerShown: false,
             tabBarLabel: ({ focused }) => (
               <Text
@@ -141,7 +149,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Home
+                Trang chủ
               </Text>
             ),
           }}
@@ -153,7 +161,7 @@ const MainTabs = () => {
           name="MyOrders"
           component={MyOrdersScreen}
           options={{
-            title: "Orders",
+            title: "Đơn hàng",
             headerShown: false,
             tabBarLabel: ({ focused }) => (
               <Text
@@ -164,7 +172,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Orders
+                Đơn hàng
               </Text>
             ),
           }}
@@ -176,7 +184,7 @@ const MainTabs = () => {
           name="Favorites"
           component={FavoritesScreen}
           options={{
-            title: "Favorites",
+            title: "Yêu thích",
             headerShown: false,
             tabBarLabel: ({ focused }) => (
               <Text
@@ -187,7 +195,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Favorites
+                Yêu thích
               </Text>
             ),
           }}
@@ -199,7 +207,7 @@ const MainTabs = () => {
           name="Profile"
           component={ProfileScreen}
           options={{
-            title: "Profile",
+            title: "Hồ sơ",
             headerShown: false,
             tabBarLabel: ({ focused }) => (
               <Text
@@ -210,7 +218,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Profile
+                Hồ sơ
               </Text>
             ),
           }}

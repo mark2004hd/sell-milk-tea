@@ -5,6 +5,7 @@ import Profile from "./Profile";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { usePromotions } from "../context/PromotionsContext";
+
 type RootStackParamList = {
   Home: undefined;
   Search: undefined;
@@ -16,7 +17,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 interface Promotion {
   id: string;
   title: string;
-  price: string;
+  price: number; // Đổi sang number
   image: string;
   description: string;
   tag?: string;
@@ -31,7 +32,6 @@ interface Notification {
 
 const Header = () => {
   const navigation = useNavigation<NavigationProp>();
-
   const isFocused = useIsFocused();
   const { promotions } = usePromotions();
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
@@ -62,8 +62,7 @@ const Header = () => {
   }, [isFocused]);
 
   const handleSearchPress = () => {
-    navigation.navigate("Search"); // ✅ Không báo lỗi nữa
-
+    navigation.navigate("Search");
   };
 
   const handleNotificationPress = () => {
@@ -80,7 +79,7 @@ const Header = () => {
       >
         <View style={headerstyle.modalContainer}>
           <View style={headerstyle.modalContent}>
-            <Text style={headerstyle.modalTitle}>Notifications</Text>
+            <Text style={headerstyle.modalTitle}>Thông báo</Text>
             {notifications.length > 0 ? (
               <FlatList
                 data={notifications}
@@ -98,13 +97,13 @@ const Header = () => {
                 )}
               />
             ) : (
-              <Text style={headerstyle.noNotificationsText}>No notifications available</Text>
+              <Text style={headerstyle.noNotificationsText}>Không có thông báo</Text>
             )}
             <Pressable
               onPress={() => setIsNotificationVisible(false)}
               style={headerstyle.closeButton}
             >
-              <Text style={headerstyle.closeButtonText}>Close</Text>
+              <Text style={headerstyle.closeButtonText}>Đóng</Text>
             </Pressable>
           </View>
         </View>
@@ -115,7 +114,7 @@ const Header = () => {
         <View style={headerstyle.textContainer}>
           <Text style={headerstyle.nameText}>Mian Da Da</Text>
           <Text style={headerstyle.descriptionText}>
-            The Young Milk Tea Lady Just Starting Out
+            Cô gái trà sữa trẻ tuổi mới bắt đầu
           </Text>
         </View>
       </View>
@@ -172,7 +171,7 @@ export const headerstyle = StyleSheet.create({
   rightContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft:10
+    marginLeft: 10,
   },
   icon: {
     marginRight: 15,
@@ -262,4 +261,4 @@ export const headerstyle = StyleSheet.create({
   },
 });
 
-export default Header
+export default Header;

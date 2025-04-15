@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { SafeAreaView } from "react-native-safe-area-context";
-import axios from "axios";
 
 type RootStackParamList = {
   Home: undefined;
@@ -26,7 +25,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 interface Promotion {
   id: string;
   title: string;
-  price: string;
+  price: string; // Match type from PromotionsContext
   image: string;
   description: string;
   tag?: string;
@@ -50,7 +49,6 @@ const HomeScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { promotions } = usePromotions();
   const flatListRef = useRef<FlatList>(null);
-
 
   // Banner carousel
   useEffect(() => {
@@ -99,28 +97,26 @@ const HomeScreen = () => {
     setSwipeCount(0);
   };
 
-  // Điều hướng đến Search với promotions
- 
   const PromotionItem = React.memo(({ item }: { item: Promotion }) => {
     return (
       <TouchableOpacity
         style={styles.promotionCard}
-        onPress={() => console.log(`Pressed on ${item.title}`)}
+        onPress={() => console.log(`Nhấn vào ${item.title}`)}
       >
         <Image
           source={{ uri: item.image }}
           style={styles.promotionImage}
           onError={(error) =>
-            console.log("Image load error:", error.nativeEvent)
+            console.log("Lỗi tải ảnh:", error.nativeEvent)
           }
         />
         <Text style={styles.promotionTitle}>{item.title}</Text>
         <Text style={styles.promotionDescription}>{item.description}</Text>
-        <Text style={styles.promotionPrice}>{item.price}</Text>
+        <Text style={styles.promotionPrice}>{Number(item.price).toFixed(2)} USD</Text>
       </TouchableOpacity>
     );
   });
-  
+
   const renderBannerItem = ({ item }: { item: string }) => (
     <TouchableOpacity
       style={styles.banner}
@@ -194,9 +190,9 @@ const HomeScreen = () => {
 
             <View style={styles.promotionsContainer}>
               <View style={styles.promotionsHeader}>
-                <Text style={styles.sectionTitle}>LATEST PROMOTIONS</Text>
-                <TouchableOpacity style={styles.viewMoreButton} >
-                  <Text style={styles.viewMoreText}>VIEW MORE</Text>
+                <Text style={styles.sectionTitle}>KHUYẾN MÃI MỚI NHẤT</Text>
+                <TouchableOpacity style={styles.viewMoreButton}>
+                  <Text style={styles.viewMoreText}>XEM THÊM</Text>
                 </TouchableOpacity>
               </View>
               <FlatList
