@@ -101,25 +101,26 @@ const HomeScreen = () => {
 
   // Điều hướng đến Search với promotions
  
-
-  const renderPromotionItem = ({ item }: { item: Promotion }) => (
-    <TouchableOpacity
-      style={styles.promotionCard}
-      onPress={() => console.log(`Pressed on ${item.title}`)}
-    >
-      <Image
-        source={{ uri: item.image }}
-        style={styles.promotionImage}
-        onError={(error) =>
-          console.log("Image load error:", error.nativeEvent)
-        }
-      />
-      <Text style={styles.promotionTitle}>{item.title}</Text>
-      <Text style={styles.promotionDescription}>{item.description}</Text>
-      <Text style={styles.promotionPrice}>{item.price}</Text>
-    </TouchableOpacity>
-  );
-
+  const PromotionItem = React.memo(({ item }: { item: Promotion }) => {
+    return (
+      <TouchableOpacity
+        style={styles.promotionCard}
+        onPress={() => console.log(`Pressed on ${item.title}`)}
+      >
+        <Image
+          source={{ uri: item.image }}
+          style={styles.promotionImage}
+          onError={(error) =>
+            console.log("Image load error:", error.nativeEvent)
+          }
+        />
+        <Text style={styles.promotionTitle}>{item.title}</Text>
+        <Text style={styles.promotionDescription}>{item.description}</Text>
+        <Text style={styles.promotionPrice}>{item.price}</Text>
+      </TouchableOpacity>
+    );
+  });
+  
   const renderBannerItem = ({ item }: { item: string }) => (
     <TouchableOpacity
       style={styles.banner}
@@ -200,7 +201,7 @@ const HomeScreen = () => {
               </View>
               <FlatList
                 data={promotions}
-                renderItem={renderPromotionItem}
+                renderItem={({ item }) => <PromotionItem item={item} />}
                 keyExtractor={(item) => item.id}
                 numColumns={2}
                 showsVerticalScrollIndicator={false}
