@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import Header from "../components/Header";
-import Category from "../screens/Category";
+import CartScreen from "../screens/Cart";
 import HomeScreen from "../screens/HomeScreen";
 
 interface Promotion {
@@ -76,7 +76,7 @@ const TopTabs = ({ promotions }: { promotions: Promotion[] }) => {
       />
       <TopTab.Screen
         name="Category"
-        component={Category}
+        component={CartScreen}
         options={{ tabBarStyle: { backgroundColor: "#fff" } }}
       />
     </TopTab.Navigator>
@@ -138,7 +138,7 @@ const MainTabs = () => {
           name="HomeTab"
           component={() => <HomeTabComponent promotions={promotions} />}
           options={{
-            title: "Trang chủ",
+            title: "Home",
             headerShown: false,
             tabBarLabel: ({ focused }) => (
               <Text
@@ -149,7 +149,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Trang chủ
+                Home
               </Text>
             ),
           }}
@@ -172,7 +172,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Đơn hàng
+                Order
               </Text>
             ),
           }}
@@ -195,7 +195,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Yêu thích
+               Favorites
               </Text>
             ),
           }}
@@ -218,7 +218,7 @@ const MainTabs = () => {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                Hồ sơ
+                Profile 
               </Text>
             ),
           }}

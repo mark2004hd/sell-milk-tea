@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 type RootStackParamList = {
   Home: undefined;
   Search: { promotions: Promotion[] };
+  Product: { productId: string };
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Home">;
@@ -40,7 +41,6 @@ const bannerImages = [
   "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome3.jpg",
   "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/intro6.jpg",
 ];
-
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const isFocused = useIsFocused();
@@ -101,7 +101,7 @@ const HomeScreen = () => {
     return (
       <TouchableOpacity
         style={styles.promotionCard}
-        onPress={() => console.log(`Nhấn vào ${item.title}`)}
+        onPress={() => navigation.navigate("Product", { productId: item.id })}
       >
         <Image
           source={{ uri: item.image }}

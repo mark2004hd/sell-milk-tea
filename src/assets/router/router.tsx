@@ -2,14 +2,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 
+import { AudioProvider } from "../context/AudioContext";
+import { CartProvider } from "../context/CartContext";
+import { PromotionsProvider } from "../context/PromotionsContext";
 import Introduce from "../screens/Introduce";
 import Login from "../screens/Login";
+import Product from "../screens/Product";
 import Search from "../screens/Search";
 import Signup from "../screens/Signup";
 import VerificationCode from "../screens/VerificationCode";
 import MainTabs from "./MainTabs";
-import { AudioProvider } from "../context/AudioContext"; // Đảm bảo import đúng từ thư mục context
-import { PromotionsProvider } from "../context/PromotionsContext";
+import CartScreen from "../screens/Cart";
 
 type RootStackParamList = {
   Introduce: undefined;
@@ -19,7 +22,8 @@ type RootStackParamList = {
   MainTabs: undefined;
   Search: undefined;
   AuthCallback: { code?: string };
-  
+  Product: { productId: string };
+  CartScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -42,18 +46,24 @@ const Router = () => {
   return (
     <AudioProvider>
       <PromotionsProvider>
-      <NavigationContainer linking={linking}>
-        <Stack.Navigator initialRouteName="Introduce" screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Introduce" component={Introduce} />
-          <Stack.Screen name="Signup" component={Signup} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="VerificationCode" component={VerificationCode} />
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-          <Stack.Screen name="Search" component={Search} />
-        </Stack.Navigator>
-      </NavigationContainer>
-       </PromotionsProvider>
-     
+        <CartProvider>
+          <NavigationContainer linking={linking}>
+            <Stack.Navigator
+              initialRouteName="Introduce"
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="Introduce" component={Introduce} />
+              <Stack.Screen name="Signup" component={Signup} />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="VerificationCode" component={VerificationCode} />
+              <Stack.Screen name="MainTabs" component={MainTabs} />
+              <Stack.Screen name="Search" component={Search} />
+              <Stack.Screen name="Product" component={Product} />
+              <Stack.Screen name="CartScreen" component={CartScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </CartProvider>
+      </PromotionsProvider>
     </AudioProvider>
   );
 };

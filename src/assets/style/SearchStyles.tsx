@@ -121,6 +121,7 @@ const styles: Styles = StyleSheet.create({
   hottestSearchItem: {
     flexDirection: "row",
     marginBottom: 15,
+    
   },
   hottestSearchImage: {
     width: 60,

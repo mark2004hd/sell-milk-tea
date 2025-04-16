@@ -25,7 +25,7 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		const fetchPromotions = async () => {
 			try {
-				const response = await fetch("http://192.168.0.101:8080/zen8labs-system/api/tea", {
+				const response = await fetch("http://192.168.37.108:8080/zen8labs-system/api/tea", {
 					method: "POST", // <-- đổi sang POST
 					headers: {
 						"Accept": "application/json",

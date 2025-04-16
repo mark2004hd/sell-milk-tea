@@ -10,6 +10,7 @@ type RootStackParamList = {
   Home: undefined;
   Search: undefined;
   Category: undefined;
+  Product: { productId: string };
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Home">;
