@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   promotionPrice: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#000000",
     marginTop: 5,
     fontWeight: "bold",

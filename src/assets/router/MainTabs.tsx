@@ -7,6 +7,7 @@ import Icon from "react-native-vector-icons/Feather";
 import Header from "../components/Header";
 import CartScreen from "../screens/Cart";
 import HomeScreen from "../screens/HomeScreen";
+import Category from "../screens/Category";
 
 interface Promotion {
   id: string;
@@ -76,7 +77,7 @@ const TopTabs = ({ promotions }: { promotions: Promotion[] }) => {
       />
       <TopTab.Screen
         name="Category"
-        component={CartScreen}
+        component={Category}
         options={{ tabBarStyle: { backgroundColor: "#fff" } }}
       />
     </TopTab.Navigator>

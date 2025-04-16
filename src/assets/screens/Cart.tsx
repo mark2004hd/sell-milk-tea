@@ -35,7 +35,7 @@ const CartScreen = () => {
 
 	// Calculate totals
 	const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-	const shippingFee = 3.0;
+	const shippingFee = 0.0;
 	const total = subtotal + shippingFee;
 
 	const handleUpdateQuantity = async (id: string, delta: number) => {

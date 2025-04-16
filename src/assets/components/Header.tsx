@@ -115,7 +115,7 @@ const Header = () => {
         <View style={headerstyle.textContainer}>
           <Text style={headerstyle.nameText}>Mian Da Da</Text>
           <Text style={headerstyle.descriptionText}>
-            Cô gái trà sữa trẻ tuổi mới bắt đầu
+          The Young Milk Tea Lady Just Starting Out
           </Text>
         </View>
       </View>

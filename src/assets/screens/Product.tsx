@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Image,
   SafeAreaView,
@@ -9,25 +9,36 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
+  Animated,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { usePromotions } from "../context/PromotionsContext";
 import { useCart } from "../context/CartContext";
 import { Ionicons } from "@expo/vector-icons";
-import Modal from "react-native-modal";
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
 
 // Font scaling function
 const scaleFont = (size: number) => {
-  return size * (width / 375); // Base width: 375 (iPhone 8)
+  const baseWidth = 375; // Base width: 375 (iPhone 8)
+  const scale = Math.min(width / baseWidth, 1.5); // Giới hạn tỷ lệ phóng to trên màn hình lớn
+  return size * scale;
 };
 
 // Responsive dimension function
 const scaleDimension = (size: number) => {
-  return size * (width / 375);
+  const baseWidth = 375; // Base width: 375 (iPhone 8)
+  const scale = Math.min(width / baseWidth, 1.5); // Giới hạn tỷ lệ phóng to trên màn hình lớn
+  return size * scale;
+};
+
+// Responsive height function
+const scaleHeight = (size: number) => {
+  const baseHeight = 667; // Base height: 667 (iPhone 8)
+  const scale = Math.min(height / baseHeight, 1.5); // Giới hạn tỷ lệ phóng to trên màn hình lớn
+  return size * scale;
 };
 
 type RootStackParamList = {
@@ -35,7 +46,7 @@ type RootStackParamList = {
   Search: { promotions: Promotion[] };
   Product: { productId: string };
   Cart: undefined;
-  CartScreen: undefined; // Add CartScreen to the type definition
+  CartScreen: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Product">;
@@ -55,6 +66,7 @@ interface Promotion {
 const Product = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp>();
+  const isFocused = useIsFocused();
   const { productId } = route.params as { productId: string };
   const { promotions } = usePromotions();
   const { addToCart } = useCart();
@@ -63,13 +75,28 @@ const Product = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isVisible, setIsVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [animationState, setAnimationState] = useState<"hidden" | "visible">("hidden");
+
+  const slideAnim = useRef(new Animated.Value(height)).current;
 
   useEffect(() => {
-    setIsModalVisible(true);
-    console.log("Modal should be visible");
-  }, []);
+    if (isFocused) {
+      setIsVisible(true);
+      if (animationState !== "visible") {
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => {
+          setAnimationState("visible");
+        });
+      }
+    } else {
+      setIsVisible(true);
+    }
+  }, [isFocused, animationState, slideAnim]);
 
   if (!product) {
     return (
@@ -78,6 +105,7 @@ const Product = () => {
       </SafeAreaView>
     );
   }
+
   const handleAddToCart = async () => {
     setIsLoading(true);
     try {
@@ -90,8 +118,15 @@ const Product = () => {
         quantity: quantity,
       });
       console.log(`Added ${quantity} ${product.title} to cart`);
-      navigation.navigate("CartScreen"); // Ensure CartScreen is defined in RootStackParamList
-      navigation.navigate("CartScreen"); // Sửa từ "Cart" thành "CartScreen"
+      Animated.timing(slideAnim, {
+        toValue: height,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        setIsVisible(false);
+        setAnimationState("hidden");
+        navigation.navigate("CartScreen");
+      });
     } catch (error) {
       console.error("Failed to add to cart:", error);
       Alert.alert("Lỗi", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
@@ -99,6 +134,7 @@ const Product = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <Image
@@ -108,32 +144,25 @@ const Product = () => {
       />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="chevron-back"
-            size={scaleFont(24)}
-            color="#333"
-          />
+          <Ionicons name="chevron-back" size={scaleFont(24)} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Product Details</Text>
         <TouchableOpacity onPress={() => navigation.navigate("CartScreen")}>
-          <Ionicons name="bag-outline" size={scaleFont(24)} color="#333" />
+          <Ionicons name="bag-outline" size={scaleFont(24)} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => setIsModalVisible(false)}
-        style={styles.modal}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.5}
-        backdropColor="#000"
-      >
-        <View style={styles.modalContent}>
+      {isVisible && (
+        <Animated.View
+          style={[
+            styles.modalContent,
+            {
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{product.title}</Text>
-            <TouchableOpacity
-              onPress={() => setIsFavorite(!isFavorite)}
-            >
+            <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
               <Ionicons
                 name={isFavorite ? "heart" : "heart-outline"}
                 size={scaleFont(24)}
@@ -153,9 +182,7 @@ const Product = () => {
             style={styles.favoriteButton}
             onPress={() => setIsFavorite(!isFavorite)}
           >
-            <Text style={styles.favoriteText}>
-              Favorite
-            </Text>
+            <Text style={styles.favoriteText}>Favorite</Text>
           </TouchableOpacity>
           <View style={styles.priceContainer}>
             <View style={styles.priceWrapper}>
@@ -165,7 +192,7 @@ const Product = () => {
               </Text>
             </View>
             <View style={styles.quantityContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setQuantity(Math.max(1, quantity - 1))}
                 style={styles.quantityButton}
               >
@@ -194,8 +221,8 @@ const Product = () => {
               </>
             )}
           </TouchableOpacity>
-        </View>
-      </Modal>
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 };
@@ -209,18 +236,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: scaleDimension(15),
-    paddingVertical: scaleDimension(10),
+    paddingHorizontal: scaleDimension(20),
+    paddingVertical: scaleDimension(20), // Giảm padding trên màn hình nhỏ
+    paddingTop: scaleHeight(40), // Đảm bảo header không bị che bởi notch hoặc status bar
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: "transparent",
+    zIndex: 10,
   },
   headerTitle: {
     fontSize: scaleFont(18),
     fontWeight: "bold",
-    color: "#333",
+    color: "#FFFFFF",
   },
   productImage: {
     width: "100%",
@@ -229,17 +258,17 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
   modalContent: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: "#fff",
     paddingHorizontal: scaleDimension(20),
     paddingVertical: scaleDimension(15),
     borderTopLeftRadius: scaleDimension(20),
     borderTopRightRadius: scaleDimension(20),
-    maxHeight: height * 0.7,
+    maxHeight: height * 0.6, // Giảm chiều cao tối đa trên màn hình nhỏ
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
