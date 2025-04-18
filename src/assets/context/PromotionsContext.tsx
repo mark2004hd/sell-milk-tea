@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-
+import { LOCAL_IPV4_ADDRESS, PORT } from "@env";
 export interface Promotion {
 	id: string;
 	title: string;
@@ -25,19 +25,20 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		const fetchPromotions = async () => {
 			try {
-				const response = await fetch("http://192.168.37.108:8080/zen8labs-system/api/tea", {
-					method: "POST", // <-- đổi sang POST
+				const response = await axios(`http://${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api/tea`, {
+					method: "POST",
 					headers: {
-						"Accept": "application/json",
-						"Content-Type": "application/json" // <-- thêm nếu cần
-					}
-				});
-
+					  Accept: "application/json",
+					  "Content-Type": "application/json",
+					},
+					// Include body if the API expects data
+					// body: JSON.stringify({ /* your payload here */ }),
+				  });
+ 
 				// const data = await response.json();
 				console.log("Response from server:", response);
-				const text = await response.text(); // <-- đọc raw text
-				console.log("Raw response text:", text);
-				const data = JSON.parse(text); // <-- ép kiểu JSON
+				const data = response.data; // Directly access the response data
+				console.log("Parsed JSON:", data);
 			console.log("Parsed JSON:", data);
 				if (data.response === "Success") {
 					setPromotions(data.promotion);

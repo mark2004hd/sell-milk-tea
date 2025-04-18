@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-
+import { LOCAL_IPV4_ADDRESS, PORT } from "@env";
 interface CartItem {
   id: string;
   title: string;
@@ -9,7 +9,6 @@ interface CartItem {
   description: string;
   quantity: number;
 }
-
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: CartItem) => Promise<void>;
@@ -21,7 +20,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Base URL for your Spring Boot backend (same as in PromotionsContext.tsx)
-const API_BASE_URL = "http://192.168.37.108:8080/zen8labs-system/api";
+const API_BASE_URL = `http://http://${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api`;
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);

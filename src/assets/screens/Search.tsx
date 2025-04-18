@@ -365,9 +365,9 @@ const Search = () => {
 				{recent.length > 0 && (
 					<View style={styles.section}>
 						<View style={styles.sectionHeader}>
-							<Text style={styles.sectionTitle}>Tìm kiếm gần đây</Text>
+							<Text style={styles.sectionTitle}>Recent Searches</Text>
 							<TouchableOpacity onPress={clearAllRecentSearches}>
-								<Text style={styles.clearAllText}>Xóa tất cả</Text>
+								<Text style={styles.clearAllText}>Clear all</Text>
 							</TouchableOpacity>
 						</View>
 						<FlatList
@@ -394,7 +394,7 @@ const Search = () => {
 								keyExtractor={(item) => item.id}
 								ListHeaderComponent={
 									<Text style={styles.sectionTitle}>
-										Kết quả tìm kiếm
+										Search results
 									</Text>
 								}
 								scrollEnabled={false}
@@ -421,7 +421,7 @@ const Search = () => {
 						</>
 					) : (
 						<>
-							<Text style={styles.sectionTitle}>Tìm kiếm nổi bật</Text>
+							<Text style={styles.sectionTitle}>Featured search</Text>
 							{promotionsData.length > 0 ? (
 								<FlatList
 									data={promotionsData}
