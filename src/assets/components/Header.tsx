@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FlatList, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import Profile from "./Profile";
+import Profile from "./ImagesProfile";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { usePromotions } from "../context/PromotionsContext";
+import ImagesProfile from "./ImagesProfile";
 
 type RootStackParamList = {
   Home: undefined;
@@ -111,7 +112,7 @@ const Header = () => {
       </Modal>
 
       <View style={headerstyle.leftContainer}>
-        <Profile />
+        <ImagesProfile/>
         <View style={headerstyle.textContainer}>
           <Text style={headerstyle.nameText}>Mian Da Da</Text>
           <Text style={headerstyle.descriptionText}>

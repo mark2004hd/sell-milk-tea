@@ -75,27 +75,21 @@ export default function Login({ navigation }: LoginProps) {
 		supabase.auth.getSession().then(({ data: { session } }) => {
 			setSession(session);
 			if (session) {
-				console.log("Phiên đăng nhập được tìm thấy khi tải ứng dụng:", session);
 				startMusicAfterLogin(); // Phát nhạc nếu đã có phiên
 				navigation.replace("MainTabs");
 			} else {
-				console.log("Không tìm thấy phiên đăng nhập khi tải ứng dụng.");
 			}
 		});
 
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((event, session) => {
-			console.log("Trạng thái xác thực thay đổi:", event, session);
 			setSession(session);
 			if (event === "SIGNED_IN" && session) {
-				console.log("Người dùng đăng nhập thành công:", session);
 				startMusicAfterLogin(); // Phát nhạc khi đăng nhập
 				navigation.replace("MainTabs");
 			} else if (event === "SIGNED_OUT") {
-				console.log("Người dùng đã đăng xuất.");
 			} else {
-				console.log("Sự kiện xác thực khác:", event);
 			}
 		});
 
@@ -105,7 +99,6 @@ export default function Login({ navigation }: LoginProps) {
 					data: { session },
 				} = await supabase.auth.getSession();
 				if (session) {
-					console.log("Phiên sau khi quay lại:", session);
 					startMusicAfterLogin(); // Phát nhạc nếu có phiên khi quay lại
 					navigation.replace("MainTabs");
 				}
@@ -150,15 +143,13 @@ export default function Login({ navigation }: LoginProps) {
 				},
 			});
 			if (error) {
-				console.error("Lỗi OAuth Supabase:", error.message);
 				throw error;
 			}
-			console.log("Đăng nhập Google thành công:", data);
+
 			if (data.url) {
 				await WebBrowser.openBrowserAsync(data.url);
 			}
 		} catch (error) {
-			console.error("Lỗi đăng nhập Google:", error);
 			alert("Đăng nhập Google thất bại. Vui lòng thử lại.");
 		}
 	};

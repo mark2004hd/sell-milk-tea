@@ -13,9 +13,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import Header from "../components/Header";
-import Category from "../screens/Category";
+import Category from "../screens/CategoryCreen";
 import HomeScreen from "../screens/HomeScreen";
+import ProfileScreen from "../screens/ProfileScreen"; // Import đúng ProfileScreen
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import CartScreen from "../screens/CartScreen";
 
 interface Promotion {
   id: string;
@@ -37,12 +39,6 @@ const MyOrdersScreen = () => (
 const FavoritesScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     <Text style={styles.placeholderText}>Yêu thích</Text>
-  </View>
-);
-
-const ProfileScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Hồ sơ</Text>
   </View>
 );
 
@@ -251,7 +247,7 @@ const MainTabs = () => {
             tabPress: () => setCurrentTab("MyOrders"),
           }}
         >
-          {() => <MyOrdersScreen />}
+          {() => <CartScreen />}
         </BottomTab.Screen>
 
         <BottomTab.Screen

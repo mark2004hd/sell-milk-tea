@@ -58,6 +58,7 @@ const Search = () => {
 	const [hasSearched, setHasSearched] = useState(false);
 	const [selectedTab, setSelectedTab] = useState<string | null>(null);
 
+	// Hàm lưu lịch sử tìm kiếm vào AsyncStorage
 	const saveRecentSearches = useCallback(async (searches: string[]) => {
 		try {
 			await AsyncStorage.setItem("recentSearches", JSON.stringify(searches));
@@ -66,6 +67,7 @@ const Search = () => {
 		}
 	}, []);
 
+	// Hàm tải lịch sử tìm kiếm từ AsyncStorage
 	const loadRecentSearches = useCallback(async () => {
 		try {
 			const storedSearches = await AsyncStorage.getItem("recentSearches");
@@ -77,10 +79,12 @@ const Search = () => {
 		}
 	}, []);
 
+	// Tải lịch sử tìm kiếm khi component được mount
 	useEffect(() => {
 		loadRecentSearches();
 	}, [loadRecentSearches]);
 
+	// Tối ưu danh sách gợi ý tìm kiếm với useMemo
 	const suggestionsData = useMemo(() => {
 		if (!searchText.trim() || hasSearched) {
 			return [];
@@ -99,29 +103,32 @@ const Search = () => {
 			.slice(0, 5);
 	}, [searchText, hasSearched, promotions]);
 
+	// Tối ưu danh sách khuyến mãi được lọc với useMemo
+	const optimizedFilteredPromotions = useMemo(() => {
+		if (!searchText.trim()) {
+			return promotions;
+		}
+		const queryLower = searchText.toLowerCase();
+		return promotions
+			.filter((item) => {
+				const priceAsString = item.price.toString();
+				return (
+					item.title.toLowerCase().includes(queryLower) ||
+					item.description.toLowerCase().includes(queryLower) ||
+					(item.tag && item.tag.toLowerCase().includes(queryLower)) ||
+					priceAsString.includes(queryLower)
+				);
+			})
+			.slice(0, 10);
+	}, [searchText, promotions]);
+
+	// Cập nhật danh sách khuyến mãi và gợi ý khi searchText thay đổi
 	useEffect(() => {
 		setSuggestions(suggestionsData);
+		setFilteredPromotions(optimizedFilteredPromotions);
+	}, [suggestionsData, optimizedFilteredPromotions]);
 
-		if (!searchText.trim()) {
-			setFilteredPromotions(promotions);
-			setHasSearched(false);
-		} else {
-			const queryLower = searchText.toLowerCase();
-			const filtered = promotions
-				.filter((item) => {
-					const priceAsString = item.price.toString();
-					return (
-						item.title.toLowerCase().includes(queryLower) ||
-						item.description.toLowerCase().includes(queryLower) ||
-						(item.tag && item.tag.toLowerCase().includes(queryLower)) ||
-						priceAsString.includes(queryLower)
-					);
-				})
-				.slice(0, 10);
-			setFilteredPromotions(filtered);
-		}
-	}, [searchText, suggestionsData, promotions]);
-
+	// Hàm thực hiện tìm kiếm
 	const performSearch = useCallback(
 		(query: string) => {
 			if (!query.trim()) {
@@ -159,14 +166,17 @@ const Search = () => {
 		[recent, saveRecentSearches, promotions],
 	);
 
+	// Hàm xử lý khi nhấn nút tìm kiếm
 	const handleSearch = useCallback(() => {
 		performSearch(searchText);
 	}, [searchText, performSearch]);
 
+	// Hàm xử lý khi nhấn Enter trên bàn phím
 	const handleSubmitEditing = useCallback(() => {
 		handleSearch();
 	}, [handleSearch]);
 
+	// Hàm xử lý khi nhấn vào gợi ý tìm kiếm
 	const handleSuggestionPress = useCallback(
 		(title: string) => {
 			setSelectedTab(title);
@@ -175,6 +185,7 @@ const Search = () => {
 		[performSearch],
 	);
 
+	// Hàm xóa một mục trong lịch sử tìm kiếm
 	const removeRecentSearch = useCallback(
 		(item: string) => {
 			const updatedRecent = recent.filter((search) => search !== item);
@@ -187,12 +198,14 @@ const Search = () => {
 		[recent, saveRecentSearches, selectedTab],
 	);
 
+	// Hàm xóa toàn bộ lịch sử tìm kiếm
 	const clearAllRecentSearches = useCallback(() => {
 		setRecent([]);
 		saveRecentSearches([]);
 		setSelectedTab(null);
 	}, [saveRecentSearches]);
 
+	// Render mục lịch sử tìm kiếm
 	const renderRecentSearch = useCallback(
 		({ item }: { item: string }) => {
 			const isSelected = selectedTab === item;
@@ -216,7 +229,8 @@ const Search = () => {
 		[removeRecentSearch, performSearch, selectedTab],
 	);
 
-	const renderHottestSearchDefault = useCallback(
+	// Component hiển thị mục khuyến mãi dạng danh sách, bọc trong React.memo để tối ưu
+	const HottestSearchDefaultItem = React.memo(
 		({ item, index }: { item: any; index: number }) => (
 			<TouchableOpacity
 				activeOpacity={0.7}
@@ -231,7 +245,11 @@ const Search = () => {
 					easing="ease-out"
 					style={styles.hottestSearchItem}>
 					<View style={styles.imageContainer}>
-						<Image source={{ uri: item.image }} style={styles.hottestSearchImage} />
+						<Image
+							source={{ uri: item.image }}
+							style={styles.hottestSearchImage}
+							resizeMode="cover" // Tối ưu hiển thị hình ảnh
+						/>
 					</View>
 
 					<View style={styles.hottestSearchTextContainerDefault}>
@@ -252,10 +270,12 @@ const Search = () => {
 				</Animatable.View>
 			</TouchableOpacity>
 		),
-		[navigation],
+		(prevProps, nextProps) =>
+			prevProps.item.id === nextProps.item.id && prevProps.index === nextProps.index,
 	);
 
-	const renderHottestSearchGrid = useCallback(
+	// Component hiển thị mục khuyến mãi dạng lưới, bọc trong React.memo để tối ưu
+	const HottestSearchGridItem = React.memo(
 		({ item, index }: { item: any; index: number }) => (
 			<TouchableOpacity
 				activeOpacity={0.7}
@@ -273,8 +293,8 @@ const Search = () => {
 						<Image
 							source={{ uri: item.image }}
 							style={styles.hottestSearchGridImage}
+							resizeMode="cover" // Tối ưu hiển thị hình ảnh
 						/>
-
 						<TouchableOpacity style={styles.heartIcon}>
 							<Ionicons name="heart-outline" size={20} color="#888" />
 						</TouchableOpacity>
@@ -291,13 +311,19 @@ const Search = () => {
 				</Animatable.View>
 			</TouchableOpacity>
 		),
-		[navigation], // Thêm navigation vào mảng phụ thuộc
+		(prevProps, nextProps) =>
+			prevProps.item.id === nextProps.item.id && prevProps.index === nextProps.index,
 	);
 
+	// Render kết quả cửa hàng
 	const renderStoreResult = useCallback(
 		({ item }: { item: any }) => (
 			<TouchableOpacity style={styles.storeResultItem}>
-				<Image source={{ uri: item.image }} style={styles.storeResultImage} />
+				<Image
+					source={{ uri: item.image }}
+					style={styles.storeResultImage}
+					resizeMode="cover" // Tối ưu hiển thị hình ảnh
+				/>
 				<View style={styles.storeResultTextContainer}>
 					<Text style={styles.storeResultName}>{item.name}</Text>
 					<Text style={styles.storeResultInfo}>
@@ -310,6 +336,7 @@ const Search = () => {
 		[],
 	);
 
+	// Render gợi ý tìm kiếm
 	const renderSuggestion = useCallback(
 		({ item }: { item: any }) => (
 			<TouchableOpacity
@@ -321,6 +348,7 @@ const Search = () => {
 		[handleSuggestionPress],
 	);
 
+	// Tối ưu danh sách khuyến mãi hiển thị (chỉ lấy 8 mục đầu tiên)
 	const promotionsData = useMemo(() => {
 		return filteredPromotions.slice(0, 8);
 	}, [filteredPromotions]);
@@ -341,7 +369,8 @@ const Search = () => {
 						/>
 						<TextInput
 							style={styles.searchInput}
-							placeholder="Tìm kiếm..."
+							placeholder="
+Searching..."
 							value={searchText}
 							onChangeText={setSearchText}
 							placeholderTextColor="#888"
@@ -356,6 +385,10 @@ const Search = () => {
 							keyExtractor={(item) => `suggestion-${item.id}`}
 							style={styles.suggestionList}
 							keyboardShouldPersistTaps="handled"
+							initialNumToRender={5} // Chỉ render 5 gợi ý ban đầu
+							maxToRenderPerBatch={5} // Render tối đa 5 mục mỗi lần
+							windowSize={3} // Giảm số lượng cửa sổ trong bộ nhớ
+							scrollEnabled={false} // Tắt cuộn để tránh xung đột với ScrollView
 						/>
 					)}
 				</View>
@@ -377,6 +410,9 @@ const Search = () => {
 							horizontal
 							showsHorizontalScrollIndicator={false}
 							contentContainerStyle={styles.recentSearchList}
+							initialNumToRender={5} // Chỉ render 5 mục ban đầu
+							maxToRenderPerBatch={5} // Render tối đa 5 mục mỗi lần
+							windowSize={3} // Giảm số lượng cửa sổ trong bộ nhớ
 						/>
 					</View>
 				)}
@@ -402,16 +438,22 @@ const Search = () => {
 							{promotionsData.length > 0 ? (
 								<FlatList
 									data={promotionsData}
-									renderItem={renderHottestSearchGrid}
+									renderItem={({ item, index }) => (
+										<HottestSearchGridItem
+											item={item}
+											index={index}
+										/>
+									)}
 									keyExtractor={(item) => item.id}
 									numColumns={2}
 									key="grid"
 									showsVerticalScrollIndicator={false}
-									initialNumToRender={8}
-									windowSize={5}
+									initialNumToRender={4} // Chỉ render 4 mục ban đầu (2 hàng)
+									maxToRenderPerBatch={4} // Render tối đa 4 mục mỗi lần
+									windowSize={5} // Giảm số lượng cửa sổ trong bộ nhớ
 									removeClippedSubviews
 									columnWrapperStyle={styles.columnWrapper}
-									scrollEnabled={false}
+									scrollEnabled={false} // Tắt cuộn để tránh xung đột với ScrollView
 								/>
 							) : (
 								<Text style={styles.noResultsText}>
@@ -425,19 +467,25 @@ const Search = () => {
 							{promotionsData.length > 0 ? (
 								<FlatList
 									data={promotionsData}
-									renderItem={renderHottestSearchDefault}
+									renderItem={({ item, index }) => (
+										<HottestSearchDefaultItem
+											item={item}
+											index={index}
+										/>
+									)}
 									keyExtractor={(item) => item.id}
 									numColumns={1}
 									key="list"
 									showsVerticalScrollIndicator={false}
-									initialNumToRender={8}
-									windowSize={5}
+									initialNumToRender={4} // Chỉ render 4 mục ban đầu
+									maxToRenderPerBatch={4} // Render tối đa 4 mục mỗi lần
+									windowSize={5} // Giảm số lượng cửa sổ trong bộ nhớ
 									removeClippedSubviews
-									scrollEnabled={false}
+									scrollEnabled={false} // Tắt cuộn để tránh xung đột với ScrollView
 								/>
 							) : (
 								<Text style={styles.noResultsText}>
-									Không tìm thấy kết quả
+									No results found
 								</Text>
 							)}
 						</>

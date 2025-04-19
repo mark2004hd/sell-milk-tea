@@ -1,6 +1,6 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { usePromotions } from "../context/PromotionsContext";
 import {
   BackHandler,
@@ -26,7 +26,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 interface Promotion {
   id: string;
   title: string;
-  price: string; // Match type from PromotionsContext
+  price: string;
   image: string;
   description: string;
   tag?: string;
@@ -41,6 +41,7 @@ const bannerImages = [
   "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome3.jpg",
   "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/intro6.jpg",
 ];
+
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const isFocused = useIsFocused();
@@ -50,7 +51,7 @@ const HomeScreen = () => {
   const { promotions } = usePromotions();
   const flatListRef = useRef<FlatList>(null);
 
-  // Banner carousel
+  // Tự động chuyển đổi banner mỗi 3 giây
   useEffect(() => {
     const interval = setInterval(() => {
       const nextIndex = (currentBanner + 1) % bannerImages.length;
@@ -61,7 +62,7 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [currentBanner]);
 
-  // Xử lý nút back
+  // Xử lý sự kiện nhấn nút back trên thiết bị
   useEffect(() => {
     const handleBackPress = () => {
       if (!isFocused) {
@@ -87,16 +88,22 @@ const HomeScreen = () => {
     return () => backHandler.remove();
   }, [swipeCount, isFocused]);
 
+  // Hàm xử lý thoát ứng dụng
   const handleExit = () => {
     setIsModalVisible(false);
     BackHandler.exitApp();
   };
 
+  // Hàm hủy modal thoát
   const handleCancel = () => {
     setIsModalVisible(false);
     setSwipeCount(0);
   };
 
+  // Tối ưu dữ liệu promotions để tránh render lại không cần thiết
+  const optimizedPromotions = useMemo(() => promotions, [promotions]);
+
+  // Thành phần hiển thị từng mục khuyến mãi, bọc trong React.memo để tối ưu hiệu suất
   const PromotionItem = React.memo(({ item }: { item: Promotion }) => {
     return (
       <TouchableOpacity
@@ -106,9 +113,7 @@ const HomeScreen = () => {
         <Image
           source={{ uri: item.image }}
           style={styles.promotionImage}
-          onError={(error) =>
-            console.log("Lỗi tải ảnh:", error.nativeEvent)
-          }
+          resizeMode="cover" // Tối ưu hiển thị hình ảnh
         />
         <Text style={styles.promotionTitle}>{item.title}</Text>
         <Text style={styles.promotionDescription}>{item.description}</Text>
@@ -117,6 +122,7 @@ const HomeScreen = () => {
     );
   });
 
+  // Hàm render từng banner
   const renderBannerItem = ({ item }: { item: string }) => (
     <TouchableOpacity
       style={styles.banner}
@@ -161,6 +167,9 @@ const HomeScreen = () => {
                     });
                   });
                 }}
+                initialNumToRender={1} // Chỉ render 1 banner ban đầu
+                maxToRenderPerBatch={1} // Render tối đa 1 banner mỗi lần
+                windowSize={3} // Giảm số lượng cửa sổ trong bộ nhớ
               />
               <View style={styles.dotsContainer}>
                 {[0, 1, 2].map((index) => (
@@ -190,13 +199,13 @@ const HomeScreen = () => {
 
             <View style={styles.promotionsContainer}>
               <View style={styles.promotionsHeader}>
-                <Text style={styles.sectionTitle}>KHUYẾN MÃI MỚI NHẤT</Text>
+                <Text style={styles.sectionTitle}>LATEST PROMOTIONS</Text>
                 <TouchableOpacity style={styles.viewMoreButton}>
-                  <Text style={styles.viewMoreText}>XEM THÊM</Text>
+                  <Text style={styles.viewMoreText}>View more</Text>
                 </TouchableOpacity>
               </View>
               <FlatList
-                data={promotions}
+                data={optimizedPromotions}
                 renderItem={({ item }) => <PromotionItem item={item} />}
                 keyExtractor={(item) => item.id}
                 numColumns={2}
@@ -204,6 +213,9 @@ const HomeScreen = () => {
                 style={styles.promotionList}
                 nestedScrollEnabled={true}
                 scrollEnabled={true}
+                initialNumToRender={4} // Chỉ render 4 mục ban đầu (2 hàng)
+                maxToRenderPerBatch={4} // Render tối đa 4 mục mỗi lần
+                windowSize={5} // Giảm số lượng cửa sổ trong bộ nhớ
               />
             </View>
           </>
@@ -309,18 +321,13 @@ const styles = StyleSheet.create({
   },
   promotionImage: {
     width: "100%",
-    height: 200,
+    height: 190, // Giảm chiều cao để tối ưu hiệu suất
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   promotionTitle: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: "bold",
     marginTop: 5,
     textAlign: "center",

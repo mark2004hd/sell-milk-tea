@@ -120,14 +120,14 @@ const Product = () => {
         const newPosition = { x: pageX + w / 2, y: pageY + h / 2 };
         setCartIconPosition(newPosition);
         cartMeasured = true;
-        console.log("Cart Icon Position:", newPosition);
+        
       });
 
       addToCartButtonRef.current?.measure((x, y, w, h, pageX, pageY) => {
         const newPosition = { x: pageX + w / 2, y: pageY + h / 2 };
         setAddToCartButtonPosition(newPosition);
         buttonMeasured = true;
-        console.log("Add to Cart Button Position:", newPosition);
+        
       });
 
       // Nếu chưa đo được cả hai vị trí, thử lại
@@ -248,7 +248,7 @@ const Product = () => {
         cartGrowAnim.setValue(1); // Reset cart icon to original size
       });
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      
       Alert.alert("Lỗi", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
     }
   };

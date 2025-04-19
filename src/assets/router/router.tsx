@@ -5,14 +5,15 @@ import React from "react";
 import { AudioProvider } from "../context/AudioContext";
 import { CartProvider } from "../context/CartContext";
 import { PromotionsProvider } from "../context/PromotionsContext";
-import Introduce from "../screens/Introduce";
-import Login from "../screens/Login";
-import Product from "../screens/Product";
-import Search from "../screens/Search";
-import Signup from "../screens/Signup";
+import Introduce from "../screens/IntroduceScreen";
+import Login from "../screens/LoginScreen";
+import Product from "../screens/ProductScreen";
+import Search from "../screens/SearchScreen";
+import Signup from "../screens/SignupScreen";
 import VerificationCode from "../screens/VerificationCode";
 import MainTabs from "./MainTabs";
-import CartScreen from "../screens/Cart";
+import CartScreen from "../screens/CartScreen";
+import SettingsScreen from "../screens/SettingScreen";
 
 type RootStackParamList = {
   Introduce: undefined;
@@ -24,6 +25,7 @@ type RootStackParamList = {
   AuthCallback: { code?: string };
   Product: { productId: string };
   CartScreen: undefined;
+  Settings: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -38,6 +40,7 @@ const linking = {
       VerificationCode: "verification",
       MainTabs: "main",
       AuthCallback: "auth-callback",
+      Setting: "setting",
     },
   },
 };
@@ -55,7 +58,7 @@ const Router = () => {
               <Stack.Screen name="Introduce" component={Introduce} />
               <Stack.Screen name="Signup" component={Signup} />
               <Stack.Screen name="Login" component={Login} />
-              <Stack.Screen name="VerificationCode" component={VerificationCode} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
               <Stack.Screen name="MainTabs" component={MainTabs} />
               <Stack.Screen name="Search" component={Search} />
               <Stack.Screen name="Product" component={Product} />

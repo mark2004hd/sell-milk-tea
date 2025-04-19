@@ -1,7 +1,7 @@
 import React from "react";
 import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 
-const Profile = () => {
+const ImagesProfile = () => {
 	return (
 		<TouchableOpacity>
 				<View style={ProfileStyle.container}>
@@ -16,7 +16,7 @@ const Profile = () => {
 	);
 };
 
-export default Profile;
+export default ImagesProfile;
 const { width, height } = Dimensions.get("window");
 export const ProfileStyle = StyleSheet.create({
 	container: {
