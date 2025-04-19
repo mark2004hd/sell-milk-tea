@@ -1,12 +1,12 @@
 {
-	"compilerOptions": {
-		"strict": true,
-		"module": "es2020",
-		"jsx": "react-native",
-		"target": "esnext",
-		"moduleResolution": "node",
-		"esModuleInterop": true,
-		"skipLibCheck": true
-	},
-	"extends": "./node_modules/expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "module": "es2020",
+    "jsx": "react-native",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "extends": "expo/tsconfig.base"
 }
