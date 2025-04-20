@@ -8,6 +8,7 @@ interface CartItem {
   image: string;
   description: string;
   quantity: number;
+  size: "S" | "M" | "L"; 
 }
 interface CartContextType {
   cartItems: CartItem[];
@@ -20,7 +21,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Base URL for your Spring Boot backend (same as in PromotionsContext.tsx)
-const API_BASE_URL = `http://http://${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api`;
+const API_BASE_URL = `${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api`;
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);

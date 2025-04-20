@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -30,16 +31,24 @@ type RootStackParamList = {
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 const SettingsScreen = ({ navigation }: Props) => {
-  const settingsItems = [
-    { name: "Edit Profile", icon: "person-outline", onPress: () => navigation.navigate("Profile") },
-    { name: "Change Password", icon: "lock-closed-outline", onPress: () => navigation.navigate("ChangePassword") },
-    { name: "Notification", icon: "notifications-outline", onPress: () => navigation.navigate("Notification") },
-    { name: "An toàn", icon: "shield-checkmark-outline", onPress: () => navigation.navigate("Security") },
-    { name: "Language", icon: "globe-outline", extraText: "中文", onPress: () => navigation.navigate("Language") },
-    { name: "Law and Policy", icon: "document-text-outline", onPress: () => navigation.navigate("LawAndPolicy") },
-    { name: "Help and Support", icon: "help-circle-outline", onPress: () => navigation.navigate("HelpAndSupport") },
-    { name: "Logout", icon: "log-out-outline", isLogout: true, onPress: () => navigation.replace("Login") },
-  ];
+  type SettingsItem = {
+    name: string;
+    icon: string;
+    onPress: () => void;
+    isLogout?: boolean;
+    extraText?: string;
+  };
+  
+  const settingsItems: SettingsItem[] = [
+      { name: "Edit Profile", icon: "person-outline", onPress: () =>  Alert.alert("Xin chào") },
+      { name: "Change Password", icon: "lock-closed-outline", onPress: () => navigation.navigate("ChangePassword") },
+      { name: "Notification", icon: "notifications-outline", onPress: () => navigation.navigate("Notification") },
+      { name: "Security", icon: "shield-checkmark-outline", onPress: () => Alert.alert("Xin chào") },
+      { name: "Language", icon: "globe-outline", extraText: "中文", onPress: () => navigation.navigate("Language") },
+      { name: "Law and Policy", icon: "document-text-outline", onPress: () => Alert.alert("Xin chào") },
+      { name: "Help and Support", icon: "help-circle-outline", onPress: () => Alert.alert("Xin chào") },
+      { name: "Logout", icon: "log-out-outline", isLogout: true, onPress: () => navigation.replace("Login") },
+    ];
 
   return (
     <SafeAreaView style={styles.container}>

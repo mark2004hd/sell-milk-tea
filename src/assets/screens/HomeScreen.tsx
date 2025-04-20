@@ -129,7 +129,6 @@ const HomeScreen = () => {
       onPress={() => setSwipeCount((prev) => prev + 1)}
     >
       <Image source={{ uri: item }} style={styles.bannerImage} />
-      <Text style={styles.bannerText}></Text>
     </TouchableOpacity>
   );
 
@@ -267,15 +266,6 @@ const styles = StyleSheet.create({
   bannerImage: {
     width: "100%",
     height: 150,
-  },
-  bannerText: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textTransform: "uppercase",
   },
   dotsContainer: {
     flexDirection: "row",

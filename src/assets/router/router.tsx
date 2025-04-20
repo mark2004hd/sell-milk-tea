@@ -4,18 +4,20 @@ import React from "react";
 
 import { AudioProvider } from "../context/AudioContext";
 import { CartProvider } from "../context/CartContext";
+import { FavoritesProvider } from "../context/FavoritesContext";
 import { PromotionsProvider } from "../context/PromotionsContext";
+import CartScreen from "../screens/CartScreen";
 import Introduce from "../screens/IntroduceScreen";
 import Login from "../screens/LoginScreen";
 import Product from "../screens/ProductScreen";
 import Search from "../screens/SearchScreen";
-import Signup from "../screens/SignupScreen";
-import VerificationCode from "../screens/VerificationCode";
-import MainTabs from "./MainTabs";
-import CartScreen from "../screens/CartScreen";
 import SettingsScreen from "../screens/SettingScreen";
+import Signup from "../screens/SignupScreen";
+import MainTabs from "./MainTabs";
+import ChangePasswordScreen from "../screens/ChangePasswordScreen";
+import NotificationScreen from "../components/NotificationScreen";
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Introduce: undefined;
   Signup: undefined;
   Login: undefined;
@@ -26,6 +28,13 @@ type RootStackParamList = {
   Product: { productId: string };
   CartScreen: undefined;
   Settings: undefined;
+  ChangePassword: undefined;
+  Notification: undefined;
+  Security: undefined;
+  Language: undefined;
+  LawAndPolicy: undefined;
+  HelpAndSupport: undefined;
+  Profile: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -41,6 +50,7 @@ const linking = {
       MainTabs: "main",
       AuthCallback: "auth-callback",
       Setting: "setting",
+      ChangePassword: "change-password",
     },
   },
 };
@@ -50,6 +60,7 @@ const Router = () => {
     <AudioProvider>
       <PromotionsProvider>
         <CartProvider>
+          <FavoritesProvider>
           <NavigationContainer linking={linking}>
             <Stack.Navigator
               initialRouteName="Introduce"
@@ -62,9 +73,13 @@ const Router = () => {
               <Stack.Screen name="MainTabs" component={MainTabs} />
               <Stack.Screen name="Search" component={Search} />
               <Stack.Screen name="Product" component={Product} />
-              <Stack.Screen name="CartScreen" component={CartScreen} />
+                <Stack.Screen name="CartScreen" component={CartScreen} />
+                <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+                <Stack.Screen name="Notification" component={NotificationScreen} />
+
             </Stack.Navigator>
-          </NavigationContainer>
+            </NavigationContainer>
+            </FavoritesProvider>
         </CartProvider>
       </PromotionsProvider>
     </AudioProvider>

@@ -15,7 +15,8 @@ import Icon from "react-native-vector-icons/Feather";
 import Header from "../components/Header";
 import Category from "../screens/CategoryCreen";
 import HomeScreen from "../screens/HomeScreen";
-import ProfileScreen from "../screens/ProfileScreen"; // Import đúng ProfileScreen
+import ProfileScreen from "../screens/ProfileScreen";
+import FavoritesScreen from "../screens/FavoritesScreen"; // Đảm bảo nhập đúng
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import CartScreen from "../screens/CartScreen";
 
@@ -30,22 +31,10 @@ interface Promotion {
   product?: string;
 }
 
-const MyOrdersScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Đơn hàng</Text>
-  </View>
-);
-
-const FavoritesScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={styles.placeholderText}>Yêu thích</Text>
-  </View>
-);
-
 const { width, height } = Dimensions.get("window");
 const isTablet = width > 768;
 
-// Static component to avoid inline function warning
+// Component tĩnh để tránh cảnh báo inline function
 const HomeScreenComponent = () => <HomeScreen />;
 
 const TopTab = createMaterialTopTabNavigator();
@@ -88,23 +77,23 @@ const TopTabs = ({ promotions }: { promotions: Promotion[] }) => {
   );
 };
 
-// Static component for HomeTab
+// Component tĩnh cho HomeTab
 const HomeTabComponent = ({ promotions }: { promotions: Promotion[] }) => (
   <TopTabs promotions={promotions} />
 );
 
 const BottomTab = createBottomTabNavigator();
 
-// Custom Tab Bar Component
+// Component Tab Bar tùy chỉnh
 const CustomTabBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
-  // Animated value to track the active tab index
+  // Giá trị động để theo dõi chỉ số tab đang hoạt động
   const animatedValue = React.useRef(new Animated.Value(state.index)).current;
 
-  // Animate the value when the tab index changes
+  // Tạo hiệu ứng động khi chỉ số tab thay đổi
   useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: state.index,
@@ -120,7 +109,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
         const label = options.title || route.name;
         const isFocused = state.index === index;
 
-        // Create animated values for scale and shadow
+        // Tạo giá trị động cho tỷ lệ và bóng
         const inputRange = state.routes.map((_, i) => i);
         const scale = animatedValue.interpolate({
           inputRange,
@@ -169,9 +158,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity,
                   shadowRadius: 4,
-                  elevation: isFocused ? 5 : 0, // Android elevation
+                  elevation: isFocused ? 5 : 0, // Elevation cho Android
                 },
-                Platform.OS === "ios" && { overflow: "visible" }, // Ensure shadow is visible on iOS
+                Platform.OS === "ios" && { overflow: "visible" }, // Đảm bảo bóng hiển thị trên iOS
               ]}
             >
               <Icon

@@ -26,7 +26,7 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 		const fetchPromotions = async () => {
 			try {
 				const response = await axios(
-					`http://${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api/tea`,
+					`${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api/tea`,
 					{
 						method: "POST",
 						headers: {

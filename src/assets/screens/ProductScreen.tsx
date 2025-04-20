@@ -15,26 +15,23 @@ import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack";
 import { usePromotions } from "../context/PromotionsContext";
 import { useCart } from "../context/CartContext";
+import { useFavorites } from "../context/FavoritesContext";
 import { Ionicons } from "@expo/vector-icons";
 
-// Get screen dimensions
 const { width, height } = Dimensions.get("window");
 
-// Font scaling function
 const scaleFont = (size: number) => {
   const baseWidth = 375;
   const scale = Math.min(width / baseWidth, 1.5);
   return size * scale;
 };
 
-// Responsive dimension function
 const scaleDimension = (size: number) => {
   const baseWidth = 375;
   const scale = Math.min(width / baseWidth, 1.5);
   return size * scale;
 };
 
-// Responsive height function
 const scaleHeight = (size: number) => {
   const baseHeight = 667;
   const scale = Math.min(height / baseHeight, 1.5);
@@ -47,6 +44,7 @@ type RootStackParamList = {
   Product: { productId: string };
   Cart: undefined;
   CartScreen: undefined;
+  Favorites: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Product">;
@@ -70,24 +68,27 @@ const Product = () => {
   const { productId } = route.params as { productId: string };
   const { promotions } = usePromotions();
   const { cartItems, addToCart } = useCart();
+  const { favorites, addToFavorites, removeFromFavorites } = useFavorites();
 
   const product = promotions.find((item) => item.id === productId);
 
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [showFlyingImage, setShowFlyingImage] = useState(false);
-  const [animXValue, setAnimXValue] = useState(0); // Track flyAnimX value
-  const [animYValue, setAnimYValue] = useState(0); // Track flyAnimY value
+  const [animXValue, setAnimXValue] = useState(0);
+  const [animYValue, setAnimYValue] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<"S" | "M" | "L">("S");
 
-  // Animation refs
+  const [isFavorite, setIsFavorite] = useState(
+    favorites.some((item) => item.id === productId && item.size === selectedSize)
+  );
+
   const slideAnim = useRef(new Animated.Value(height)).current;
   const flyAnimX = useRef(new Animated.Value(0)).current;
   const flyAnimY = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1.5)).current; // Start at 1.5x
+  const scaleAnim = useRef(new Animated.Value(1.5)).current;
   const opacityAnim = useRef(new Animated.Value(1)).current;
-  const cartGrowAnim = useRef(new Animated.Value(1)).current; // For cart grow effect
+  const cartGrowAnim = useRef(new Animated.Value(1)).current;
 
-  // Refs for measuring positions
   const cartIconRef = useRef<View>(null);
   const addToCartButtonRef = useRef<View>(null);
   const [cartIconPosition, setCartIconPosition] = useState({ x: 0, y: 0 });
@@ -106,11 +107,10 @@ const Product = () => {
     }
   }, [isFocused, slideAnim]);
 
-  // Measure cart icon and add to cart button positions with retries
   useEffect(() => {
     let retries = 0;
-    const maxRetries = 5; // Số lần thử tối đa
-    const retryDelay = 100; // Delay giữa các lần thử (ms)
+    const maxRetries = 5;
+    const retryDelay = 100;
 
     const measurePositions = () => {
       let cartMeasured = false;
@@ -120,17 +120,14 @@ const Product = () => {
         const newPosition = { x: pageX + w / 2, y: pageY + h / 2 };
         setCartIconPosition(newPosition);
         cartMeasured = true;
-        
       });
 
       addToCartButtonRef.current?.measure((x, y, w, h, pageX, pageY) => {
         const newPosition = { x: pageX + w / 2, y: pageY + h / 2 };
         setAddToCartButtonPosition(newPosition);
         buttonMeasured = true;
-        
       });
 
-      // Nếu chưa đo được cả hai vị trí, thử lại
       if (!cartMeasured || !buttonMeasured) {
         if (retries < maxRetries) {
           retries++;
@@ -141,21 +138,57 @@ const Product = () => {
       }
     };
 
-    // Bắt đầu đo sau khi layout hoàn tất
     const timer = setTimeout(measurePositions, 100);
     return () => clearTimeout(timer);
-  }, []); // Chỉ chạy một lần khi mount
+  }, []);
+
+  useEffect(() => {
+    setIsFavorite(
+      favorites.some((item) => item.id === productId && item.size === selectedSize)
+    );
+  }, [favorites, productId, selectedSize]);
 
   if (!product) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>Không tìm thấy sản phẩm</Text>
+        <Text style={styles.errorText}>Product not found</Text>
       </SafeAreaView>
     );
   }
 
+  const cleanText = (text?: string) => {
+    if (!text) return ""; // Trả về chuỗi rỗng nếu text là undefined hoặc null
+    return text.replace(/<[^>]+>/g, ""); // Loại bỏ thẻ HTML
+  };
+
+  const calculatePrice = () => {
+    let price = Number(product.price);
+    if (selectedSize === "M") {
+      price *= 1.1;
+    } else if (selectedSize === "L") {
+      price *= 1.15;
+    }
+    return price * quantity;
+  };
+
+  const handleFavoriteToggle = () => {
+    if (isFavorite) {
+      removeFromFavorites(product.id, selectedSize);
+    } else {
+      addToFavorites({
+        id: product.id,
+        title: product.title,
+        price: calculatePrice() / quantity,
+        image: product.image,
+        description: product.description,
+        size: selectedSize,
+      });
+      
+    }
+    setIsFavorite(!isFavorite);
+  };
+
   const handleAddToCart = () => {
-    // Kiểm tra xem vị trí đã được đo chưa
     if (
       cartIconPosition.x === 0 ||
       cartIconPosition.y === 0 ||
@@ -163,71 +196,69 @@ const Product = () => {
       addToCartButtonPosition.y === 0
     ) {
       console.warn("Positions not ready, retrying measurement...");
-      // Thử đo lại vị trí
       cartIconRef.current?.measure((x, y, w, h, pageX, pageY) => {
         setCartIconPosition({ x: pageX + w / 2, y: pageY + h / 2 });
       });
       addToCartButtonRef.current?.measure((x, y, w, h, pageX, pageY) => {
         setAddToCartButtonPosition({ x: pageX + w / 2, y: pageY + h / 2 });
       });
-      Alert.alert("Lỗi", "Vui lòng thử lại sau giây lát.");
-      return; // Thoát nếu vị trí chưa sẵn sàng
+      Alert.alert("Error", "Please try again after a moment.");
+      return;
     }
 
     try {
       addToCart({
         id: product.id,
         title: product.title,
-        price: Number(product.price),
+        price: calculatePrice() / quantity,
         image: product.image,
         description: product.description,
         quantity: quantity,
+        size: selectedSize,
       });
-      console.log(`Added ${quantity} ${product.title} to cart`);
+      console.log(`Added ${quantity} ${product.title} (Size: ${selectedSize}) to cart`);
 
-      // Set up listeners to track animation values
       flyAnimX.addListener(({ value }) => setAnimXValue(value));
       flyAnimY.addListener(({ value }) => setAnimYValue(value));
 
-      // Trigger flying animation and cart grow
       setShowFlyingImage(true);
       Animated.parallel([
         Animated.timing(flyAnimX, {
           toValue: cartIconPosition.x - addToCartButtonPosition.x + scaleDimension(10),
-          duration: 3000, // Set to 3 seconds
+          duration: 3000,
           easing: Easing.out(Easing.exp),
           useNativeDriver: true,
         }),
         Animated.sequence([
           Animated.timing(flyAnimY, {
             toValue: cartIconPosition.y - addToCartButtonPosition.y - scaleDimension(50),
-            duration: 1500, // Set to 1.5 seconds
+            duration: 1500,
             easing: Easing.out(Easing.exp),
             useNativeDriver: true,
           }),
           Animated.timing(flyAnimY, {
             toValue: cartIconPosition.y - addToCartButtonPosition.y + scaleDimension(5),
-            duration: 1500, // Set to 1.5 seconds
+            duration: 1500,
             easing: Easing.in(Easing.exp),
             useNativeDriver: true,
           }),
         ]),
         Animated.timing(scaleAnim, {
-          toValue: 0.5, // Shrink to 0.5x
-          duration: 3000, // Set to 3 seconds
-          easing: Easing.linear, // Smooth linear scaling
+          toValue: 0.5,
+          duration: 3000,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
         Animated.timing(opacityAnim, {
           toValue: 0.5,
-          duration: 3000, // Set to 3 seconds
+          duration: 3000,
           easing: Easing.out(Easing.exp),
           useNativeDriver: true,
         }),
         Animated.timing(cartGrowAnim, {
-          toValue: 1.5, // Grow cart icon to 1.5x
-          duration: 3000, // Set to 3 seconds
-          easing: Easing.linear, // Smooth linear scaling
+          toValue: 1.5,
+          duration: 3000,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -237,19 +268,16 @@ const Product = () => {
           cartIcon: cartIconPosition,
         });
         setShowFlyingImage(false);
-        // Remove listeners
         flyAnimX.removeAllListeners();
         flyAnimY.removeAllListeners();
-        // Reset animation values
         flyAnimX.setValue(0);
         flyAnimY.setValue(0);
-        scaleAnim.setValue(1.5); // Reset to initial large scale
+        scaleAnim.setValue(1.5);
         opacityAnim.setValue(1);
-        cartGrowAnim.setValue(1); // Reset cart icon to original size
+        cartGrowAnim.setValue(1);
       });
     } catch (error) {
-      
-      Alert.alert("Lỗi", "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
+      Alert.alert("Error", "Unable to add product to cart. Please try again.");
     }
   };
 
@@ -260,6 +288,11 @@ const Product = () => {
         style={styles.productImage}
         resizeMode="cover"
       />
+      <View/>{cartItems.length > 0 && (
+        <View style={styles.cartBadge}>
+          <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
+        </View>
+      )}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={scaleFont(24)} color="#FFFFFF" />
@@ -293,8 +326,8 @@ const Product = () => {
         ]}
       >
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{product.title}</Text>
-          <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
+          <Text style={styles.modalTitle}>{cleanText(product.title)}</Text>
+          <TouchableOpacity onPress={handleFavoriteToggle}>
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
               size={scaleFont(24)}
@@ -305,22 +338,79 @@ const Product = () => {
         <View style={styles.ratingContainer}>
           <View style={styles.ratingWrapper}>
             <Ionicons name="star" size={scaleFont(16)} color="#FFD700" />
-            <Text style={styles.ratingText}> 4.6 (660 đánh giá)</Text>
+            <Text style={styles.ratingText}>4.6 (660 đánh giá)</Text>
           </View>
         </View>
-        <Text style={styles.modalDescription}>{product.product}</Text>
-        <Text style={styles.modalDescription}>{product.description}</Text>
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={() => setIsFavorite(!isFavorite)}
-        >
-          <Text style={styles.favoriteText}>Favorite</Text>
-        </TouchableOpacity>
+        <Text style={styles.modalDescription}>{cleanText(product.product)}</Text>
+        <Text style={styles.modalDescription}>{cleanText(product.description)}</Text>
+
+        <View style={styles.sizeAndFavoriteContainer}>
+          <View style={styles.sizeContainer}>
+            <Text style={styles.sizeLabel}>Size: </Text>
+            <View style={styles.sizeButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.sizeButton,
+                  selectedSize === "S" && styles.sizeButtonSelected,
+                ]}
+                onPress={() => setSelectedSize("S")}
+              >
+                <Text
+                  style={[
+                    styles.sizeButtonText,
+                    selectedSize === "S" && styles.sizeButtonTextSelected,
+                  ]}
+                >
+                  S
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.sizeButton,
+                  selectedSize === "M" && styles.sizeButtonSelected,
+                ]}
+                onPress={() => setSelectedSize("M")}
+              >
+                <Text
+                  style={[
+                    styles.sizeButtonText,
+                    selectedSize === "M" && styles.sizeButtonTextSelected,
+                  ]}
+                >
+                  M
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.sizeButton,
+                  selectedSize === "L" && styles.sizeButtonSelected,
+                ]}
+                onPress={() => setSelectedSize("L")}
+              >
+                <Text
+                  style={[
+                    styles.sizeButtonText,
+                    selectedSize === "L" && styles.sizeButtonTextSelected,
+                  ]}
+                >
+                  L
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.favoriteButton}
+            onPress={handleFavoriteToggle}
+          >
+            <Text style={styles.favoriteText}>Favorite</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.priceContainer}>
           <View style={styles.priceWrapper}>
             <Text style={styles.priceLabel}>Payment Amount:</Text>
             <Text style={styles.price}>
-              {(Number(product.price) * quantity).toFixed(2)}USD
+              {calculatePrice().toFixed(2)}USD
             </Text>
           </View>
           <View style={styles.quantityContainer}>
@@ -349,7 +439,6 @@ const Product = () => {
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Flying Image Animation */}
       {showFlyingImage && (
         <Animated.View
           style={[
@@ -381,6 +470,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     flexDirection: "row",
@@ -475,14 +566,52 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     color: "#666",
   },
+  sizeAndFavoriteContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: scaleDimension(20),
+  },
+  sizeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  sizeLabel: {
+    fontSize: scaleFont(14),
+    fontWeight: "bold",
+    color: "#333",
+    marginRight: scaleDimension(10),
+  },
+  sizeButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
+  sizeButton: {
+    paddingVertical: scaleDimension(6),
+    paddingHorizontal: scaleDimension(12),
+    borderRadius: scaleDimension(15),
+    borderWidth: 1,
+    borderColor: "#666",
+    marginRight: scaleDimension(8),
+  },
+  sizeButtonSelected: {
+    backgroundColor: "#AB9377",
+    borderColor: "#AB9377",
+  },
+  sizeButtonText: {
+    fontSize: scaleFont(12),
+    color: "#666",
+  },
+  sizeButtonTextSelected: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
   favoriteButton: {
     backgroundColor: "#AB9377",
     paddingVertical: scaleDimension(6),
     paddingHorizontal: scaleDimension(27),
     borderRadius: scaleDimension(20),
     alignItems: "center",
-    marginBottom: scaleDimension(20),
-    alignSelf: "flex-end",
     borderBottomWidth: 2,
     borderBottomColor: "#8B6F47",
     flexDirection: "row",
@@ -552,7 +681,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: scaleFont(18),
-    color: "#666",
+    color: "#FF0000",
     textAlign: "center",
     marginTop: scaleDimension(20),
   },
