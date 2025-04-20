@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
-
+    private final EmailService emailService;
     PasswordEncoder passwordEncoder;
 
     public BaseResponse<?> create(UserCreateRequest request){
@@ -35,9 +35,15 @@ public class UserService {
         Timestamp currentTime = Timestamp.from(Instant.now());
         user.setId(String.valueOf(UUID.randomUUID()));
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         userRepository.save(user);
-
+        sendEMailActive(user.getEmail());
         return new BaseResponse<>();
     }
 
+    public void sendEMailActive(String email){
+        String subject="hello";
+        String text="chao mung ban den voi app tea";
+        emailService.sendEmail("dodinhtuanyb2k4@gmail.com",email,text,subject);
+    }
 }

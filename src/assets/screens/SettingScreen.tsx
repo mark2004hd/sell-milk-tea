@@ -41,12 +41,12 @@ const SettingsScreen = ({ navigation }: Props) => {
   
   const settingsItems: SettingsItem[] = [
       { name: "Edit Profile", icon: "person-outline", onPress: () =>  Alert.alert("Xin chào") },
-      { name: "Change Password", icon: "lock-closed-outline", onPress: () => navigation.navigate("ChangePassword") },
+      { name: "Change Password", icon: "lock-closed-outline", onPress: () =>navigation.navigate("ChangePassword") },
       { name: "Notification", icon: "notifications-outline", onPress: () => navigation.navigate("Notification") },
       { name: "Security", icon: "shield-checkmark-outline", onPress: () => Alert.alert("Xin chào") },
-      { name: "Language", icon: "globe-outline", extraText: "中文", onPress: () => navigation.navigate("Language") },
+      { name: "Language", icon: "globe-outline", extraText: "中文", onPress: () => Alert.alert("Xin chào") },
       { name: "Law and Policy", icon: "document-text-outline", onPress: () => Alert.alert("Xin chào") },
-      { name: "Help and Support", icon: "help-circle-outline", onPress: () => Alert.alert("Xin chào") },
+      { name: "Help and Support", icon: "help-circle-outline", onPress: () => navigation.navigate("HelpAndSupport") },
       { name: "Logout", icon: "log-out-outline", isLogout: true, onPress: () => navigation.replace("Login") },
     ];
 
