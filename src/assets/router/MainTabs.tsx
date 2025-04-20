@@ -1,24 +1,23 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { BottomTabBarProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Animated,
   Dimensions,
+  Platform,
   StyleSheet,
   Text,
-  View,
-  Animated,
   TouchableOpacity,
-  Platform,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
 import Header from "../components/Header";
+import CartScreen from "../screens/CartScreen";
 import Category from "../screens/CategoryCreen";
+import FavoritesScreen from "../screens/FavoritesScreen"; // Đảm bảo nhập đúng
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import FavoritesScreen from "../screens/FavoritesScreen"; // Đảm bảo nhập đúng
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import CartScreen from "../screens/CartScreen";
 
 interface Promotion {
   id: string;

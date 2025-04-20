@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TeaRepository extends JpaRepository<Tea, Integer> {
-
+    Tea findByTeaId(String teaId);
 }
