@@ -1,137 +1,60 @@
-import axios from "axios";
-import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { LOCAL_IPV4_ADDRESS, PORT } from "@env";
+// CartContext.tsx (đã có từ trước, chỉ kiểm tra để tham khảo)
+import React, { createContext, useContext, useState } from "react";
+
 interface CartItem {
   id: string;
   title: string;
-  price: number;
-  image: string;
   description: string;
+  price: number;
   quantity: number;
-  size: "S" | "M" | "L"; 
+  image: string;
+  size: string;
 }
+
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: CartItem) => Promise<void>;
-  updateQuantity: (id: string, delta: number) => Promise<void>;
-  removeFromCart: (id: string) => Promise<void>;
-  fetchCartItems: () => Promise<void>;
+  addToCart: (item: CartItem) => void;
+  updateQuantity: (id: string, delta: number) => void;
+  removeFromCart: (id: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Base URL for your Spring Boot backend (same as in PromotionsContext.tsx)
-const API_BASE_URL = `${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api`;
-
-export const CartProvider = ({ children }: { children: ReactNode }) => {
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Fetch cart items from the backend
-  const fetchCartItems = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/cart`, {
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = response.data;
-      if (data.response === "Success") {
-        setCartItems(data.cartItems); // Adjust based on your API response structure
-      } else {
-        console.log("Failed to fetch cart items:", data);
-      }
-    } catch (error) {
-      console.error("Error fetching cart items:", error);
-    }
-  };
-
-  // Add item to cart via API
-  const addToCart = async (item: CartItem) => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/cart/add`,
-        {
-          id: item.id,
-          title: item.title,
-          price: item.price,
-          image: item.image,
-          description: item.description,
-          quantity: item.quantity,
-        },
-        {
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-        }
+  const addToCart = (item: CartItem) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find(
+        (i) => i.id === item.id && i.size === item.size
       );
-      const data = response.data;
-      if (data.response === "Success") {
-        await fetchCartItems(); // Refresh cart after adding
-      } else {
-        console.log("Failed to add item to cart:", data);
+      if (existingItem) {
+        return prevItems.map((i) =>
+          i.id === item.id && i.size === item.size
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        );
       }
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-    }
+      return [...prevItems, item];
+    });
   };
 
-  // Update quantity of an item in the cart via API
-  const updateQuantity = async (id: string, delta: number) => {
-    try {
-      const item = cartItems.find((cartItem) => cartItem.id === id);
-      if (!item) return;
-
-      const newQuantity = Math.max(1, item.quantity + delta);
-      const response = await axios.put(
-        `${API_BASE_URL}/cart/update`,
-        { id, quantity: newQuantity },
-        {
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = response.data;
-      if (data.response === "Success") {
-        await fetchCartItems(); // Refresh cart after updating
-      } else {
-        console.log("Failed to update quantity:", data);
-      }
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-    }
+  const updateQuantity = (id: string, delta: number) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id && item.quantity + delta > 0
+          ? { ...item, quantity: item.quantity + delta }
+          : item
+      ).filter((item) => item.quantity > 0)
+    );
   };
 
-  // Remove item from cart via API
-  const removeFromCart = async (id: string) => {
-    try {
-      const response = await axios.delete(`${API_BASE_URL}/cart/remove/${id}`, {
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = response.data;
-      if (data.response === "Success") {
-        await fetchCartItems(); // Refresh cart after removing
-      } else {
-        console.log("Failed to remove item from cart:", data);
-      }
-    } catch (error) {
-      console.error("Error removing item from cart:", error);
-    }
+  const removeFromCart = (id: string) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
-
-  // Fetch cart items when the provider mounts
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, removeFromCart, fetchCartItems }}>
+    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, removeFromCart }}>
       {children}
     </CartContext.Provider>
   );

@@ -14,8 +14,8 @@ import {
 import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { usePromotions } from "../context/PromotionsContext";
-import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
+import { useCart } from "../context/CartContext";
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
@@ -67,8 +67,8 @@ const Product = () => {
   const isFocused = useIsFocused();
   const { productId } = route.params as { productId: string };
   const { promotions } = usePromotions();
-  const { cartItems, addToCart } = useCart();
   const { favorites, addToFavorites, removeFromFavorites } = useFavorites();
+  const { addToCart, cartItems } = useCart();
 
   const product = promotions.find((item) => item.id === productId);
 
@@ -157,8 +157,8 @@ const Product = () => {
   }
 
   const cleanText = (text?: string) => {
-    if (!text) return ""; // Trả về chuỗi rỗng nếu text là undefined hoặc null
-    return text.replace(/<[^>]+>/g, ""); // Loại bỏ thẻ HTML
+    if (!text) return "";
+    return text.replace(/<[^>]+>/g, "");
   };
 
   const calculatePrice = () => {
@@ -171,6 +171,51 @@ const Product = () => {
     return price * quantity;
   };
 
+  const basePrice = () => {
+    let price = Number(product.price);
+    if (selectedSize === "M") {
+      price *= 1.1;
+    } else if (selectedSize === "L") {
+      price *= 1.15;
+    }
+    return price;
+  };
+
+  const getDiscountSuggestion = () => {
+    const countSizeSAndUp = cartItems.filter((item) =>
+      ["S", "M", "L"].includes(item.size)
+    ).length;
+    const countSizeMAndUp = cartItems.filter((item) =>
+      ["M", "L"].includes(item.size)
+    ).length;
+    const countSizeLAndUp = cartItems.filter((item) =>
+      ["L"].includes(item.size)
+    ).length;
+
+    const newCountSizeSAndUp = countSizeSAndUp + quantity;
+    const newCountSizeMAndUp =
+      countSizeMAndUp + (["M", "L"].includes(selectedSize) ? quantity : 0);
+    const newCountSizeLAndUp =
+      countSizeLAndUp + (selectedSize === "L" ? quantity : 0);
+
+    if (newCountSizeLAndUp >= 2) {
+      return "Add this to cart to get 11% off (2 or more Size L items)!";
+    } else if (newCountSizeSAndUp >= 3) {
+      return "Add this to cart to get 9% off (3 or more items, Size S and up)!";
+    } else if (newCountSizeMAndUp >= 2) {
+      return "Add this to cart to get 7% off (2 or more items, Size M and up)!";
+    } else if (newCountSizeLAndUp === 1 && selectedSize === "L") {
+      return "Add one more Size L item to get 11% off!";
+    } else if (newCountSizeSAndUp === 2) {
+      return "Add one more item to get 9% off (3 or more items, Size S and up)!";
+    } else if (newCountSizeMAndUp === 1 && ["M", "L"].includes(selectedSize)) {
+      return "Add one more Size M or L item to get 7% off!";
+    }
+    return "";
+  };
+
+  const discountSuggestion = getDiscountSuggestion();
+
   const handleFavoriteToggle = () => {
     if (isFavorite) {
       removeFromFavorites(product.id, selectedSize);
@@ -178,12 +223,11 @@ const Product = () => {
       addToFavorites({
         id: product.id,
         title: product.title,
-        price: calculatePrice() / quantity,
+        price: basePrice(),
         image: product.image,
         description: product.description,
         size: selectedSize,
       });
-      
     }
     setIsFavorite(!isFavorite);
   };
@@ -208,15 +252,14 @@ const Product = () => {
 
     try {
       addToCart({
-        id: product.id,
-        title: product.title,
-        price: calculatePrice() / quantity,
+        id: product.id + selectedSize,
+        title: cleanText(product.title),
+        description: cleanText(product.description) || cleanText(product.product),
+        price: basePrice(),
+        quantity,
         image: product.image,
-        description: product.description,
-        quantity: quantity,
         size: selectedSize,
       });
-      console.log(`Added ${quantity} ${product.title} (Size: ${selectedSize}) to cart`);
 
       flyAnimX.addListener(({ value }) => setAnimXValue(value));
       flyAnimY.addListener(({ value }) => setAnimYValue(value));
@@ -262,11 +305,6 @@ const Product = () => {
           useNativeDriver: true,
         }),
       ]).start(() => {
-        console.log("Final Animation Position:", {
-          x: animXValue,
-          y: animYValue,
-          cartIcon: cartIconPosition,
-        });
         setShowFlyingImage(false);
         flyAnimX.removeAllListeners();
         flyAnimY.removeAllListeners();
@@ -275,6 +313,8 @@ const Product = () => {
         scaleAnim.setValue(1.5);
         opacityAnim.setValue(1);
         cartGrowAnim.setValue(1);
+
+        navigation.navigate("CartScreen");
       });
     } catch (error) {
       Alert.alert("Error", "Unable to add product to cart. Please try again.");
@@ -288,11 +328,6 @@ const Product = () => {
         style={styles.productImage}
         resizeMode="cover"
       />
-      <View/>{cartItems.length > 0 && (
-        <View style={styles.cartBadge}>
-          <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
-        </View>
-      )}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={scaleFont(24)} color="#FFFFFF" />
@@ -309,11 +344,6 @@ const Product = () => {
             }}
           >
             <Ionicons name="bag-outline" size={scaleFont(24)} color="#FFFFFF" />
-            {cartItems.length > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
-              </View>
-            )}
           </Animated.View>
         </TouchableOpacity>
       </View>
@@ -409,14 +439,16 @@ const Product = () => {
         <View style={styles.priceContainer}>
           <View style={styles.priceWrapper}>
             <Text style={styles.priceLabel}>Payment Amount:</Text>
-            <Text style={styles.price}>
-              {calculatePrice().toFixed(2)}USD
-            </Text>
+            <Text style={styles.price}>{calculatePrice().toFixed(2)} USD</Text>
+            {discountSuggestion ? (
+              <Text style={styles.discountSuggestion}>{discountSuggestion}</Text>
+            ) : null}
           </View>
           <View style={styles.quantityContainer}>
             <TouchableOpacity
               onPress={() => setQuantity(Math.max(1, quantity - 1))}
               style={styles.quantityButton}
+              activeOpacity={0.7}
             >
               <Text style={styles.quantityText}>-</Text>
             </TouchableOpacity>
@@ -424,6 +456,7 @@ const Product = () => {
             <TouchableOpacity
               onPress={() => setQuantity(quantity + 1)}
               style={styles.quantityButton}
+              activeOpacity={0.7}
             >
               <Text style={styles.quantityText}>+</Text>
             </TouchableOpacity>
@@ -630,6 +663,8 @@ const styles = StyleSheet.create({
   priceWrapper: {
     flexDirection: "column",
     alignItems: "flex-start",
+    flex: 1,
+    marginRight: scaleDimension(10),
   },
   priceLabel: {
     fontSize: scaleFont(16),
@@ -643,26 +678,42 @@ const styles = StyleSheet.create({
     color: "#FF6347",
     marginTop: scaleDimension(5),
   },
+  discountSuggestion: {
+    fontSize: scaleFont(12),
+    color: "#FF6347",
+    fontStyle: "italic",
+    marginTop: scaleDimension(5),
+    flexWrap: "wrap",
+  },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: scaleDimension(20),
-    paddingHorizontal: scaleDimension(10),
+    justifyContent: "center",
+    minWidth: scaleDimension(100),
   },
   quantityButton: {
-    padding: scaleDimension(10),
+    width: scaleDimension(30),
+    height: scaleDimension(30),
+    borderRadius: scaleDimension(15),
+    borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
   quantityText: {
-    fontSize: scaleFont(18),
+    fontSize: scaleFont(20),
     fontWeight: "bold",
     color: "#333",
+    textAlign: "center",
   },
   quantity: {
     fontSize: scaleFont(16),
     fontWeight: "bold",
     color: "#333",
     marginHorizontal: scaleDimension(15),
+    textAlign: "center",
+    minWidth: scaleDimension(20),
   },
   addToCartButton: {
     backgroundColor: "#AB9377",
