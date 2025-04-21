@@ -27,7 +27,6 @@ public class User {
     String password;
     String cartId;
     String email;
-
 }
 
 
