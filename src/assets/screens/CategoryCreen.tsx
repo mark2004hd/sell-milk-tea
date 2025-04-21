@@ -17,14 +17,7 @@ const categories: CategoryItem[] = [
 		id: "2",
 		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome3.jpg",
 	},
-	{
-		id: "3",
-		image: "https://via.placeholder.com/300x150",
-	},
-	{
-		id: "4",
-		image: "https://via.placeholder.com/300x150",
-	},
+	
 ];
 
 const Category = () => {

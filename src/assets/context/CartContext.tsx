@@ -1,5 +1,5 @@
-// CartContext.tsx (đã có từ trước, chỉ kiểm tra để tham khảo)
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface CartItem {
   id: string;
@@ -11,17 +11,78 @@ interface CartItem {
   size: string;
 }
 
+interface Order {
+  id: string;
+  items: CartItem[];
+  total: number;
+  date: string;
+  address: string; // Added address field
+  phoneNumber: string; // Added phoneNumber field
+}
+
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: CartItem) => void;
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
+  orderHistory: Order[];
+  saveOrder: (order: Omit<Order, "id" | "date">) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [orderHistory, setOrderHistory] = useState<Order[]>([]);
+
+  // Load dữ liệu từ AsyncStorage khi ứng dụng khởi động
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load cartItems
+        const storedCartItems = await AsyncStorage.getItem('cartItems');
+        if (storedCartItems) {
+          setCartItems(JSON.parse(storedCartItems));
+        }
+
+        // Load orderHistory
+        const storedOrderHistory = await AsyncStorage.getItem('orderHistory');
+        if (storedOrderHistory) {
+          setOrderHistory(JSON.parse(storedOrderHistory));
+        }
+      } catch (error) {
+        console.error("Failed to load data from AsyncStorage:", error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Lưu cartItems vào AsyncStorage mỗi khi nó thay đổi
+  useEffect(() => {
+    const saveCartItems = async () => {
+      try {
+        await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+      } catch (error) {
+        console.error("Failed to save cartItems to AsyncStorage:", error);
+      }
+    };
+
+    saveCartItems();
+  }, [cartItems]);
+
+  // Lưu orderHistory vào AsyncStorage mỗi khi nó thay đổi
+  useEffect(() => {
+    const saveOrderHistory = async () => {
+      try {
+        await AsyncStorage.setItem('orderHistory', JSON.stringify(orderHistory));
+      } catch (error) {
+        console.error("Failed to save orderHistory to AsyncStorage:", error);
+      }
+    };
+
+    saveOrderHistory();
+  }, [orderHistory]);
 
   const addToCart = (item: CartItem) => {
     setCartItems((prevItems) => {
@@ -41,11 +102,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateQuantity = (id: string, delta: number) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id && item.quantity + delta > 0
-          ? { ...item, quantity: item.quantity + delta }
-          : item
-      ).filter((item) => item.quantity > 0)
+      prevItems
+        .map((item) =>
+          item.id === id && item.quantity + delta > 0
+            ? { ...item, quantity: item.quantity + delta }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
     );
   };
 
@@ -53,8 +116,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
+  const saveOrder = (order: Omit<Order, "id" | "date">) => {
+    setOrderHistory((prevHistory) => [
+      ...prevHistory,
+      {
+        id: `order_${Date.now()}`,
+        items: order.items,
+        total: order.total,
+        date: new Date().toISOString(),
+        address: order.address, // Save address
+        phoneNumber: order.phoneNumber, // Save phoneNumber
+      },
+    ]);
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, removeFromCart }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        updateQuantity,
+        removeFromCart,
+        orderHistory,
+        saveOrder,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

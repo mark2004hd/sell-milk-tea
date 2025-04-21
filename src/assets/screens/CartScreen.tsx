@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -32,18 +33,23 @@ type RootStackParamList = {
   Product: { productId: string };
   Cart: undefined;
   CartScreen: undefined;
+  OrderSuccess: undefined;
+  OrderHistory: undefined;
+  EditAddress: { onSave: (address: string, phoneNumber: string) => void };
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Cart">;
 
 const CartScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { cartItems, updateQuantity, removeFromCart } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, saveOrder } = useCart();
 
   const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]); // State to track selected items
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [address, setAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-  // Toggle selection of an item
   const toggleItemSelection = (itemId: string) => {
     if (selectedItems.includes(itemId)) {
       setSelectedItems(selectedItems.filter((id) => id !== itemId));
@@ -52,41 +58,36 @@ const CartScreen = () => {
     }
   };
 
-  // Filter selected items for subtotal calculation
   const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item.id));
 
-  // Calculate subtotal for selected items only
+  const itemsBySize = selectedCartItems.reduce((acc: { [key: string]: { items: any[]; totalPrice: number } }, item) => {
+    const size = item.size;
+    if (!acc[size]) {
+      acc[size] = { items: [], totalPrice: 0 };
+    }
+    acc[size].items.push(item);
+    acc[size].totalPrice += item.price * item.quantity;
+    return acc;
+  }, {});
+
+  let discountAmount = 0;
+  let discountReasons: string[] = [];
+  const discountPercentage = 15;
+
+  Object.keys(itemsBySize).forEach((size) => {
+    const sizeData = itemsBySize[size];
+    const itemCount = sizeData.items.length;
+    if (itemCount >= 2) {
+      const discountForSize = (sizeData.totalPrice * discountPercentage) / 100;
+      discountAmount += discountForSize;
+      discountReasons.push(`${discountPercentage}% off for ${itemCount} items of Size ${size}`);
+    }
+  });
+
   const subtotal = selectedCartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-
-  // Count selected items by size for discount logic
-  const countSizeSAndUp = selectedCartItems.filter((item) =>
-    ["S", "M", "L"].includes(item.size)
-  ).length;
-  const countSizeMAndUp = selectedCartItems.filter((item) =>
-    ["M", "L"].includes(item.size)
-  ).length;
-  const countSizeLAndUp = selectedCartItems.filter((item) =>
-    ["L"].includes(item.size)
-  ).length;
-
-  // Determine discount
-  let discountPercentage = 0;
-  let discountReason = "";
-  if (countSizeLAndUp >= 2) {
-    discountPercentage = 11;
-    discountReason = "11% off for 2 or more Size L items";
-  } else if (countSizeSAndUp >= 3) {
-    discountPercentage = 9;
-    discountReason = "9% off for 3 or more items (Size S and up)";
-  } else if (countSizeMAndUp >= 2) {
-    discountPercentage = 7;
-    discountReason = "7% off for 2 or more items (Size M and up)";
-  }
-
-  const discountAmount = (subtotal * discountPercentage) / 100;
   const discountedSubtotal = subtotal - discountAmount;
 
   const shippingFee = 0.0;
@@ -107,12 +108,48 @@ const CartScreen = () => {
     setLoadingItemId(id);
     try {
       removeFromCart(id);
-      setSelectedItems(selectedItems.filter((selectedId) => selectedId !== id)); // Remove from selected items if deleted
+      setSelectedItems(selectedItems.filter((selectedId) => selectedId !== id));
     } catch (error) {
       console.error("Failed to remove item:", error);
     } finally {
       setLoadingItemId(null);
     }
+  };
+
+  const handleConfirmOrder = () => {
+    if (address.trim() === '' || phoneNumber.trim() === '') {
+      alert('Please fill in both address and phone number.');
+      return;
+    }
+
+    setIsConfirming(true);
+
+    setTimeout(() => {
+      // Save the order to CartContext, including address and phoneNumber
+      saveOrder({
+        items: selectedCartItems,
+        total: total,
+        address: address,
+        phoneNumber: phoneNumber,
+      });
+
+      selectedItems.forEach((id) => removeFromCart(id));
+      setSelectedItems([]);
+      setAddress('');
+      setPhoneNumber('');
+
+      setIsConfirming(false);
+      navigation.navigate("OrderSuccess");
+    }, 3000);
+  };
+
+  const handleEditAddress = () => {
+    navigation.navigate('EditAddress', {
+      onSave: (newAddress: string, newPhoneNumber: string) => {
+        setAddress(newAddress);
+        setPhoneNumber(newPhoneNumber);
+      },
+    });
   };
 
   const renderRightActions = (itemId: string) => (
@@ -139,11 +176,11 @@ const CartScreen = () => {
           onPress={() => toggleItemSelection(item.id)}
           style={[
             styles.checkbox,
-            selectedItems.includes(item.id) && styles.checkboxSelected, // Apply selected style dynamically
+            selectedItems.includes(item.id) && styles.checkboxSelected,
           ]}
         >
           {selectedItems.includes(item.id) && (
-            <Ionicons name="checkmark" size={scaleFont(16)} color="#fff" /> // White checkmark
+            <Ionicons name="checkmark" size={scaleFont(16)} color="#fff" />
           )}
         </TouchableOpacity>
         <Image source={{ uri: item.image }} style={styles.itemImage} />
@@ -194,8 +231,14 @@ const CartScreen = () => {
           <Ionicons name="chevron-back" size={scaleFont(24)} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Shopping Cart</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("CartScreen")}>
-          <Ionicons name="bag-outline" size={scaleFont(24)} color="#333" />
+        <TouchableOpacity onPress={() => navigation.navigate("OrderHistory")}>
+          <Ionicons name="time-outline" size={scaleFont(24)} color="#333" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.addressHeader}>
+        <Text style={styles.addressHeaderText}>Select address</Text>
+        <TouchableOpacity onPress={handleEditAddress}>
+          <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </View>
       <FlatList
@@ -206,20 +249,43 @@ const CartScreen = () => {
       />
       {selectedItems.length > 0 && (
         <>
+          {/* Address and Phone Number Input Section */}
+          <View style={styles.addressInputContainer}>
+            <Text style={styles.inputLabel}>Delivery Address</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your address"
+              value={address}
+              onChangeText={setAddress}
+              editable={false}
+            />
+            <Text style={styles.inputLabel}>Phone Number</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your phone number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              keyboardType="phone-pad"
+              editable={false}
+            />
+          </View>
+
           <View style={styles.summaryContainer}>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Subtotal</Text>
               <Text style={styles.summaryValue}>{subtotal.toFixed(2)} USD</Text>
             </View>
-            {discountPercentage > 0 && (
+            {discountAmount > 0 && (
               <>
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Discount ({discountPercentage}%)</Text>
+                  <Text style={styles.summaryLabel}>Discount</Text>
                   <Text style={styles.summaryValue}>-{discountAmount.toFixed(2)} USD</Text>
                 </View>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.discountReason}>{discountReason}</Text>
-                </View>
+                {discountReasons.map((reason, index) => (
+                  <View key={index} style={styles.summaryRow}>
+                    <Text style={styles.discountReason}>{reason}</Text>
+                  </View>
+                ))}
               </>
             )}
             <View style={styles.summaryRow}>
@@ -232,8 +298,16 @@ const CartScreen = () => {
               <Text style={styles.totalValue}>{total.toFixed(2)} USD</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.confirmButton}>
-            <Text style={styles.confirmButtonText}>Confirm Order</Text>
+          <TouchableOpacity
+            style={[styles.confirmButton, isConfirming && styles.confirmButtonDisabled]}
+            onPress={handleConfirmOrder}
+            disabled={isConfirming}
+          >
+            {isConfirming ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.confirmButtonText}>Confirm Order</Text>
+            )}
           </TouchableOpacity>
         </>
       )}
@@ -260,6 +334,23 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+  addressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: scaleDimension(15),
+    paddingVertical: scaleDimension(10),
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  addressHeaderText: {
+    fontSize: scaleFont(16),
+    color: "#333",
+  },
+  editButtonText: {
+    fontSize: scaleFont(16),
+    color: "#666",
+  },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -280,8 +371,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   checkboxSelected: {
-    backgroundColor: "#28a745", // Green color when selected
-    borderColor: "#28a745", // Match border to background for a seamless look
+    backgroundColor: "#28a745",
+    borderColor: "#28a745",
   },
   itemImage: {
     width: scaleDimension(80),
@@ -334,6 +425,27 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FF6347",
   },
+  addressInputContainer: {
+    padding: scaleDimension(15),
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  inputLabel: {
+    fontSize: scaleFont(16),
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: scaleDimension(5),
+  },
+  input: {
+    width: '100%',
+    height: scaleDimension(40),
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: scaleDimension(5),
+    paddingHorizontal: scaleDimension(10),
+    marginBottom: scaleDimension(15),
+  },
   summaryContainer: {
     padding: scaleDimension(15),
     borderTopWidth: 1,
@@ -376,6 +488,9 @@ const styles = StyleSheet.create({
     margin: scaleDimension(15),
     borderRadius: scaleDimension(10),
     alignItems: "center",
+  },
+  confirmButtonDisabled: {
+    backgroundColor: "#a68c6a",
   },
   confirmButtonText: {
     fontSize: scaleFont(16),

@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-interface FavoriteItem {
+export interface FavoriteItem {
   id: string;
   title: string;
   price: number;
   image: string;
   description: string;
   size: "S" | "M" | "L";
+  tag?: string;
+  tagColor?: string;
 }
 
 interface FavoritesContextType {

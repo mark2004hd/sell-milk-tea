@@ -18,6 +18,9 @@ import SettingsScreen from "../screens/SettingScreen";
 import Signup from "../screens/SignupScreen";
 import MainTabs from "./MainTabs";
 import LawAndPolicyScreen from "../components/LawAndPolicy";
+import OrderSuccessScreen from "../components/OrderSuccessScreen";
+import OrderHistoryScreen from "../components/OrderHistoryScreen";
+import EditAddressScreen from "../context/EditAddressScreen";
 
 export type RootStackParamList = {
   Introduce: undefined;
@@ -37,6 +40,9 @@ export type RootStackParamList = {
   LawAndPolicy: undefined;
   HelpAndSupport: undefined;
   Profile: undefined;
+  OrderSuccess: undefined;
+  OrderHistory: undefined;
+  EditAddress: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -57,6 +63,7 @@ const linking = {
       LawAndPolicy: "law-and-policy", 
       Notification: "notification",
       Security: "security",
+      OrderHistory: "order-history",
     },
   },
 };
@@ -84,6 +91,9 @@ const Router = () => {
               <Stack.Screen name="Notification" component={NotificationScreen} />
               <Stack.Screen name="HelpAndSupport" component={HelpAndSupportScreen} />
               <Stack.Screen name="LawAndPolicy" component={LawAndPolicyScreen} />
+              <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
+              <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+              <Stack.Screen name="EditAddress" component={EditAddressScreen} />
           
             </Stack.Navigator>
             </NavigationContainer>
