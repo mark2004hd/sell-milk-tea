@@ -35,12 +35,15 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 						},
 						// Include body if the API expects data
 						// body: JSON.stringify({ /* your payload here */ }),
+						
 					},
 				);
+				console.log("URL:", `${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/api/tea`);
+
 
 				const data = response.data; // Directly access the response data
 
-				console.log("Parsed JSON:", data);
+				// console.log("Parsed JSON:", data);
 				if (data.response === "Success") {
 					setPromotions(data.promotion);
 				} else {

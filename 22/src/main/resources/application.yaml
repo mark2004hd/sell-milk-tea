@@ -15,3 +15,18 @@ open:
     description: Banking System
     serverUrl: http://localhost:8080/zen8labs-system
     serverName: Server Test
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dodinhtuanyb2k4@gmail.com
+    password: fvocofqpeseipsia
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        mail:
+          debug: true

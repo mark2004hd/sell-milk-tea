@@ -23,21 +23,41 @@ import java.util.UUID;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
-
+    EmailServiceImpl emailService;
     PasswordEncoder passwordEncoder;
 
+    private void validateUsernameAndPassword(UserCreateRequest request) {
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new AppException(ErrorCode.USERNAME_INVALID);
+        }
+
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
+        }
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new AppException(ErrorCode.EMAIL_INVALID);
+        }
+
+
+    }
+
     public BaseResponse<?> create(UserCreateRequest request){
+        validateUsernameAndPassword(request);
         if(userRepository.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED);
 
         User user=new User();
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        Timestamp currentTime = Timestamp.from(Instant.now());
         user.setId(String.valueOf(UUID.randomUUID()));
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         userRepository.save(user);
-
+        sendEMailActive(user.getEmail());
         return new BaseResponse<>();
     }
-
+    public void sendEMailActive(String email){
+        String subject="hello";
+        String text="chao mung ban";
+        emailService.sendEmail("dodinhtuanyb2k4@gmail.com",email,text,subject);
+    }
 }
