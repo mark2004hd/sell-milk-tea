@@ -1,3 +1,4 @@
+import { LOCAL_IPV4_ADDRESS, PORT } from "@env";
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
@@ -15,9 +16,9 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { supabase } from "../config/Supabase/SupabaseClient";
+import { useAudio } from "../context/AudioContext"; // Import useAudio
 import signupStyle from "../style/signupStyle";
 import loginStyle from "../style/styleLogin";
-import { LOCAL_IPV4_ADDRESS, PORT } from "@env";
 
 type RootStackParamList = {
   Introduce: undefined;
@@ -42,6 +43,8 @@ export default function Login({ navigation }: LoginProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [visibilityTimeout, setVisibilityTimeout] = useState<NodeJS.Timeout | null>(null);
   const [session, setSession] = useState<any>(null);
+
+  const { startMusicAfterLogin } = useAudio(); // Lấy hàm phát nhạc từ context
 
   useEffect(() => {
     const backAction = () => {
@@ -158,50 +161,42 @@ export default function Login({ navigation }: LoginProps) {
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/auth/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email, // Giả sử 'email' chứa giá trị tên đăng nhập
+          password: password,
+        }),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+        Alert.alert("Login Failed", errorData.message || "Invalid credentials");
+        return;
+      }
 
-//   const handleTempLogin = () => {
-//     const trimmedEmail = email.trim();
-//     const trimmedPassword = password.trim();
-  
-//     if (trimmedEmail === "admin" && trimmedPassword === "123") {
-//       console.log("Đăng nhập tạm thành công");
-//       navigation.replace("MainTabs");
-//     } else {
-//       alert("Tài khoản hoặc mật khẩu không đúng.");
-//     }
-//   };
-const handleLogin = async () => {
-	try {
-	  const response = await fetch(`${LOCAL_IPV4_ADDRESS}:${PORT}/zen8labs-system/auth/token`, {
-		method: "POST",
-		headers: {
-		  "Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-		  username: email, // Assuming 'email' holds the username value
-		  password: password,
-		}),
-	  });
-  
-	  if (!response.ok) {
-		const errorData = await response.json();
-		console.error("Login failed:", errorData);
-		Alert.alert("Login Failed", errorData.message || "Invalid credentials");
-		return;
-	  }
-  
-	  const data = await response.json();
-	  console.log("Login success:", data);
-	  navigation.replace("MainTabs");
-	  // 👇 Lưu token vào AsyncStorage
-	  // await AsyncStorage.setItem("accessToken", data.accessToken);
-  
-	} catch (error) {
-	  console.error("Error:", error);
-	  Alert.alert("Error", "Something went wrong. Please try again.");
-	}
+      const data = await response.json();
+      console.log("Login success:", data);
+      navigation.replace("MainTabs");
+
+      // Sau khi đăng nhập thành công, gọi hàm để phát nhạc từ context
+      startMusicAfterLogin();
+
+      // 👇 Lưu token vào AsyncStorage
+      // await AsyncStorage.setItem("accessToken", data.accessToken);
+
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
   };
+
   return (
     <SafeAreaView style={loginStyle.container}>
       <ScrollView style={loginStyle.scrollView}>
@@ -245,7 +240,7 @@ const handleLogin = async () => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleLogin } style={loginStyle.ClickLogin}>
+        <TouchableOpacity onPress={handleLogin} style={loginStyle.ClickLogin}>
           <Text style={loginStyle.textLogin}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>

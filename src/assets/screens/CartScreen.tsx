@@ -250,25 +250,7 @@ const CartScreen = () => {
       {selectedItems.length > 0 && (
         <>
           {/* Address and Phone Number Input Section */}
-          <View style={styles.addressInputContainer}>
-            <Text style={styles.inputLabel}>Delivery Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your address"
-              value={address}
-              onChangeText={setAddress}
-              editable={false}
-            />
-            <Text style={styles.inputLabel}>Phone Number</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your phone number"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              keyboardType="phone-pad"
-              editable={false}
-            />
-          </View>
+      
 
           <View style={styles.summaryContainer}>
             <View style={styles.summaryRow}>

@@ -33,8 +33,7 @@ export const PromotionsProvider = ({ children }: { children: ReactNode }) => {
 							Accept: "application/json",
 							"Content-Type": "application/json",
 						},
-						// Include body if the API expects data
-						// body: JSON.stringify({ /* your payload here */ }),
+						
 						
 					},
 				);
