@@ -1,258 +1,257 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useFavorites, FavoriteItem } from '../context/FavoritesContext'; // Import FavoriteItem
-import { usePromotions } from '../context/PromotionsContext';
+import React, { useState } from "react";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  Image,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { useFavorites } from "../context/FavoritesContext";
 
-const { width } = Dimensions.get('window');
-
-const scaleFont = (size: number) => {
-  return size * (width / 375);
-};
-
-const scaleDimension = (size: number) => {
-  return size * (width / 375);
+type FavoriteItem = {
+  id: string;
+  title: string;
+  price: number;
+  image: string;
+  description: string;
+  size: "S" | "M" | "L";
 };
 
 const FavoritesScreen = () => {
   const { favorites, removeFromFavorites } = useFavorites();
-  const { promotions } = usePromotions();
-  
-  const [categories, setCategories] = useState<string[]>(['All']);
-  const [categoryColors, setCategoryColors] = useState<{ [key: string]: string }>({ All: '#000' });
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Trích xuất danh mục từ promotions
-  useEffect(() => {
-    const uniqueTags = new Set<string>();
-    const tagColorMap: { [key: string]: string } = { All: '#000' }; // Màu mặc định cho "All"
+  const categories = ["All", "Trà Sữa Trân Châu", "Trà Sữa Matcha", "Trà Sữa Phô Mai"];
 
-    promotions.forEach((promo) => {
-      if (promo.tag) {
-        uniqueTags.add(promo.tag);
-        if (promo.tagColor) {
-          tagColorMap[promo.tag] = promo.tagColor;
-        }
-      }
-    });
-
-    const newCategories = ['All', ...Array.from(uniqueTags)];
-    setCategories(newCategories);
-    setCategoryColors(tagColorMap);
-  }, [promotions]);
-
-  // Lọc favorites theo danh mục đã chọn
-  const filteredFavorites = selectedCategory === 'All'
+  const filteredFavorites = selectedCategory === "All"
     ? favorites
-    : favorites.filter((fav) => fav.tag === selectedCategory);
+    : favorites.filter((item) => item.title.includes(selectedCategory));
 
-  const renderCategory = ({ item }: { item: string }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryItem,
-        {
-          backgroundColor: selectedCategory === item ? categoryColors[item] || '#000' : '#fff',
-          borderColor: categoryColors[item] || '#000',
-        },
-      ]}
-      onPress={() => setSelectedCategory(item)}
-    >
-      <Text
-        style={[
-          styles.categoryText,
-          { color: selectedCategory === item ? '#fff' : categoryColors[item] || '#000' },
-        ]}
-      >
-        {item}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderFavorite = ({ item }: { item: FavoriteItem }) => (
-    <View style={styles.favoriteItem}>
-      <Image source={{ uri: item.image }} style={styles.favoriteImage} />
-      <View style={styles.favoriteDetails}>
-        <Text style={styles.favoriteTitle}>{item.title}</Text>
-        <Text style={styles.favoriteDescription}>
-          {item.description} (Size: {item.size})
-        </Text>
-        <Text style={styles.favoritePrice}>{item.price.toFixed(2)} USD</Text>
-        {item.tag && (
-          <View
-            style={[
-              styles.tag,
-              { backgroundColor: item.tagColor || '#ccc' },
-            ]}
-          >
-            <Text style={styles.tagText}>{item.tag}</Text>
-          </View>
-        )}
+  const renderItem = ({ item }: { item: FavoriteItem }) => (
+    <View style={styles.itemContainer}>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.image }} style={styles.itemImage} />
+        <TouchableOpacity
+          style={styles.removeIcon}
+          onPress={() => removeFromFavorites(item.id, item.size)}
+        >
+          <Icon name="heart" size={wp(5)} color="#FF0000" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => removeFromFavorites(item.id, item.size)}
-        style={styles.removeButton}
-      >
-        <Ionicons name="trash-outline" size={scaleFont(20)} color="#FF6347" />
-      </TouchableOpacity>
+      <View style={styles.ratingContainer}>
+        {Array.from({ length: 5 }, (_, index) => (
+          <Icon
+            key={index}
+            name={index < 4 ? "star" : "star-outline"}
+            size={wp(4)}
+            color="#FFD700"
+          />
+        ))}
+        <Text style={styles.reviewsText}>(10)</Text>
+      </View>
+      <Text style={styles.itemName}>{item.title}</Text>
+      <Text style={styles.itemDetails}>
+        Flavor: Original - Size: {item.size} {/* Sửa lỗi bằng cách nối chuỗi đúng cách */}
+      </Text>
+      <View style={styles.priceContainer}>
+        <Text style={styles.itemPrice}>{(item.price).toLocaleString()}USD</Text>
+      </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Favorites</Text>
-        <Ionicons name="search-outline" size={scaleFont(24)} color="#333" />
+        <TouchableOpacity>
+          <Icon name="search-outline" size={wp(6)} color="#000" />
+        </TouchableOpacity>
       </View>
-      <View style={styles.filterRow}>
-        <FlatList
-          horizontal
-          data={categories}
-          renderItem={renderCategory}
-          keyExtractor={(item) => item}
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoryList}
-        />
+
+      <View style={styles.categoriesContainer}>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category && styles.categoryButtonActive,
+            ]}
+            onPress={() => setSelectedCategory(category)}
+          >
+            <Text
+              style={[
+                styles.categoryText,
+                selectedCategory === category && styles.categoryTextActive,
+              ]}
+            >
+              {category}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
-      <View style={styles.sortRow}>
+
+      <View style={styles.filtersContainer}>
         <TouchableOpacity style={styles.filterButton}>
-          <Ionicons name="filter-outline" size={scaleFont(20)} color="#333" />
+          <Icon name="filter-outline" size={wp(5)} color="#000" />
           <Text style={styles.filterText}>Filters</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.sortButton}>
-          <Ionicons name="swap-vertical-outline" size={scaleFont(20)} color="#333" />
+          <Icon name="swap-vertical-outline" size={wp(5)} color="#000" />
           <Text style={styles.sortText}>Price: lowest to high</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.gridButton}>
-          <Ionicons name="grid-outline" size={scaleFont(20)} color="#333" />
+        <TouchableOpacity>
+          <Icon name="grid-outline" size={wp(5)} color="#000" />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={filteredFavorites}
-        renderItem={renderFavorite}
-        keyExtractor={(item) => `${item.id}-${item.size}`}
-        ListEmptyComponent={<Text style={styles.emptyText}>No favorites yet!</Text>}
-      />
-    </View>
+
+      {filteredFavorites.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No favorites yet!</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredFavorites}
+          renderItem={renderItem}
+          keyExtractor={(item) => `${item.id}-${item.size}`}
+          numColumns={2}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#FFF",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: scaleDimension(15),
-    paddingVertical: scaleDimension(10),
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: wp(4),
+    paddingVertical: hp(2),
   },
   headerTitle: {
-    fontSize: scaleFont(18),
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: wp(5.5),
+    fontWeight: "bold",
+    color: "#000",
   },
-  filterRow: {
-    paddingVertical: scaleDimension(10),
+  categoriesContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: hp(1),
+    flexWrap: "wrap",
   },
-  categoryList: {
-    paddingHorizontal: scaleDimension(10),
+  categoryButton: {
+    paddingVertical: hp(1),
+    paddingHorizontal: wp(4),
+    borderRadius: wp(5),
+    backgroundColor: "#F0F0F0",
+    marginVertical: hp(0.5),
   },
-  categoryItem: {
-    paddingHorizontal: scaleDimension(15),
-    paddingVertical: scaleDimension(8),
-    marginHorizontal: scaleDimension(5),
-    borderRadius: scaleDimension(20),
-    borderWidth: 1,
+  categoryButtonActive: {
+    backgroundColor: "#000",
   },
   categoryText: {
-    fontSize: scaleFont(14),
-    fontWeight: 'bold',
+    fontSize: wp(4),
+    color: "#000",
   },
-  sortRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: scaleDimension(15),
-    paddingVertical: scaleDimension(5),
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  categoryTextActive: {
+    color: "#FFF",
+  },
+  filtersContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: wp(4),
+    paddingVertical: hp(1),
   },
   filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  filterText: {
-    fontSize: scaleFont(14),
-    color: '#333',
-    marginLeft: scaleDimension(5),
+    flexDirection: "row",
+    alignItems: "center",
   },
   sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  filterText: {
+    fontSize: wp(4),
+    marginLeft: wp(2),
   },
   sortText: {
-    fontSize: scaleFont(14),
-    color: '#333',
-    marginLeft: scaleDimension(5),
+    fontSize: wp(4),
+    marginLeft: wp(2),
   },
-  gridButton: {
-    padding: scaleDimension(5),
+  listContainer: {
+    paddingHorizontal: wp(2),
   },
-  favoriteItem: {
-    flexDirection: 'row',
-    padding: scaleDimension(15),
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    alignItems: 'center',
-  },
-  favoriteImage: {
-    width: scaleDimension(80),
-    height: scaleDimension(80),
-    borderRadius: scaleDimension(10),
-    marginRight: scaleDimension(10),
-  },
-  favoriteDetails: {
+  itemContainer: {
     flex: 1,
+    margin: wp(2),
+    backgroundColor: "#FFF",
   },
-  favoriteTitle: {
-    fontSize: scaleFont(16),
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: scaleDimension(5),
+  imageContainer: {
+    position: "relative",
   },
-  favoriteDescription: {
-    fontSize: scaleFont(12),
-    color: '#666',
-    marginBottom: scaleDimension(5),
+  itemImage: {
+    width: "100%",
+    height: hp(20),
+    borderRadius: wp(3),
   },
-  favoritePrice: {
-    fontSize: scaleFont(14),
-    fontWeight: 'bold',
-    color: '#FF6347',
-    marginBottom: scaleDimension(5),
+  removeIcon: {
+    position: "absolute",
+    bottom: hp(1),
+    right: wp(2),
+    backgroundColor: "#FFF",
+    borderRadius: wp(5),
+    padding: wp(2),
   },
-  tag: {
-    paddingHorizontal: scaleDimension(10),
-    paddingVertical: scaleDimension(5),
-    borderRadius: scaleDimension(10),
-    alignSelf: 'flex-start',
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: hp(1),
   },
-  tagText: {
-    fontSize: scaleFont(12),
-    color: '#fff',
+  reviewsText: {
+    fontSize: wp(3.5),
+    color: "#666",
+    marginLeft: wp(1),
   },
-  removeButton: {
-    padding: scaleDimension(10),
+  itemName: {
+    fontSize: wp(4),
+    fontWeight: "bold",
+    color: "#000",
+  },
+  itemDetails: {
+    fontSize: wp(3.5),
+    color: "#666",
+    marginVertical: hp(0.5),
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  itemPrice: {
+    fontSize: wp(4),
+    fontWeight: "bold",
+    color: "#000",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyText: {
-    fontSize: scaleFont(16),
-    color: '#666',
-    textAlign: 'center',
-    marginTop: scaleDimension(20),
+    fontSize: wp(5),
+    color: "#666",
   },
 });
 

@@ -8,13 +8,6 @@ jwt:
   valid-duration: 3600  # in second
   refreshable-duration: 360000  # in seconds
 
-open:
-  api:
-    title: API document
-    version: 1.0.0
-    description: Banking System
-    serverUrl: http://localhost:8080/zen8labs-system
-    serverName: Server Test
 spring:
   mail:
     host: smtp.gmail.com
@@ -28,5 +21,17 @@ spring:
           auth: true
           starttls:
             enable: true
-        mail:
-          debug: true
+        debug: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+open:
+  api:
+    title: API document
+    version: 1.0.0
+    description: Banking System
+    serverUrl: http://localhost:8080/zen8labs-system
+    serverName: Server Test
