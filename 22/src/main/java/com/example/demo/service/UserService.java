@@ -42,8 +42,8 @@ public class UserService {
     }
 
     public void sendEMailActive(String email){
-        String subject="hello";
-        String text="chao mung ban den voi app tea";
+        String subject="Xin chào";
+        String text="Chào Mừng bạn đã đến với quán trà sữa Mianta";
         emailService.sendEmail("dodinhtuanyb2k4@gmail.com",email,text,subject);
     }
 }
