@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.request.AuthenticationRequest;
 import com.example.demo.dto.request.IntrospectRequest;
 import com.example.demo.dto.request.LogoutRequest;
+import com.example.demo.dto.request.RefreshRequest;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.dto.response.AuthenticationResponse;
 import com.example.demo.dto.response.IntrospectResponse;
@@ -30,45 +31,29 @@ import java.text.ParseException;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
-    @Operation(summary = "Generate token", description = "Send a request via this API to get token")
     @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         var result = authenticationService.authenticate(request);
-        return ApiResponse.<AuthenticationResponse>builder()
-                .code(2000)
-                .result(result)
-                .build();
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
 
-    @Operation(summary = "Introspect", description = "Send a request via this API to authenticated token")
     @PostMapping("/introspect")
-    ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request)
+    ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
             throws ParseException, JOSEException {
-        return ApiResponse.<IntrospectResponse>builder()
-                .code(2000)
-                .result(authenticationService.introspect(request))
-                .build();
+        var result = authenticationService.introspect(request);
+        return ApiResponse.<IntrospectResponse>builder().result(result).build();
     }
 
-    @Operation(summary = "Logout", description = "Send a request via this API to logout")
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    }
+
     @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
-            throws ParseException, JOSEException {
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
-        return ApiResponse.<Void>builder()
-                .code(2000)
-                .message("Logout successfully")
-                .build();
+        return ApiResponse.<Void>builder().build();
     }
-
-//    @Operation(summary = "Refresh token", description = "Send a request via this API to refresh new token")
-//    @PostMapping("/refresh")
-//    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request)
-//            throws ParseException, JOSEException {
-//        return ApiResponse.<AuthenticationResponse>builder()
-//                .code(2000)
-//                .result(authenticationService.refreshToken(request))
-//                .message("Request to refresh token succesfully!")
-//                .build();
-//    }
 }

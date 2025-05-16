@@ -3,11 +3,13 @@ package com.example.demo.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -27,6 +29,9 @@ public class User {
     String password;
     String cartId;
     String email;
+    @ManyToMany
+    Set<Role> roles;
+
 }
 
 
