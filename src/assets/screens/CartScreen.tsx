@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dimensions,
   FlatList,
@@ -11,11 +11,11 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useCart } from "../context/CartContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,7 +35,7 @@ type RootStackParamList = {
   CartScreen: undefined;
   OrderSuccess: undefined;
   OrderHistory: undefined;
-  EditAddress: { onSave: (address: string, phoneNumber: string) => void };
+  AddressSelection: { onSave: (address: string, phoneNumber: string) => void };
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, "Cart">;
@@ -49,6 +49,23 @@ const CartScreen = () => {
   const [isConfirming, setIsConfirming] = useState(false);
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+
+  // Load default address from AsyncStorage when the component mounts
+  useEffect(() => {
+    const loadDefaultAddress = async () => {
+      try {
+        const savedAddress = await AsyncStorage.getItem('selectedAddress');
+        if (savedAddress) {
+          const parsedAddress = JSON.parse(savedAddress);
+          setAddress(`${parsedAddress.addressLine1}, ${parsedAddress.addressLine2}`);
+          setPhoneNumber(parsedAddress.phoneNumber);
+        }
+      } catch (error) {
+        console.error('Failed to load default address:', error);
+      }
+    };
+    loadDefaultAddress();
+  }, []);
 
   const toggleItemSelection = (itemId: string) => {
     if (selectedItems.includes(itemId)) {
@@ -125,7 +142,6 @@ const CartScreen = () => {
     setIsConfirming(true);
 
     setTimeout(() => {
-      // Save the order to CartContext, including address and phoneNumber
       saveOrder({
         items: selectedCartItems,
         total: total,
@@ -144,7 +160,7 @@ const CartScreen = () => {
   };
 
   const handleEditAddress = () => {
-    navigation.navigate('EditAddress', {
+    navigation.navigate('AddressSelection', {
       onSave: (newAddress: string, newPhoneNumber: string) => {
         setAddress(newAddress);
         setPhoneNumber(newPhoneNumber);
@@ -241,6 +257,15 @@ const CartScreen = () => {
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </View>
+      {selectedItems.length > 0 && address && phoneNumber && (
+        <View style={styles.selectedAddressContainer}>
+          <Ionicons name="location-outline" size={scaleFont(16)} color="#28a745" style={styles.locationIcon} />
+          <View style={styles.addressDetails}>
+            <Text style={styles.addressText}>{address}</Text>
+            <Text style={styles.phoneText}>{phoneNumber}</Text>
+          </View>
+        </View>
+      )}
       <FlatList
         data={cartItems}
         renderItem={renderItem}
@@ -249,9 +274,6 @@ const CartScreen = () => {
       />
       {selectedItems.length > 0 && (
         <>
-          {/* Address and Phone Number Input Section */}
-      
-
           <View style={styles.summaryContainer}>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Subtotal</Text>
@@ -407,27 +429,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FF6347",
   },
-  addressInputContainer: {
-    padding: scaleDimension(15),
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  inputLabel: {
-    fontSize: scaleFont(16),
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: scaleDimension(5),
-  },
-  input: {
-    width: '100%',
-    height: scaleDimension(40),
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: scaleDimension(5),
-    paddingHorizontal: scaleDimension(10),
-    marginBottom: scaleDimension(15),
-  },
   summaryContainer: {
     padding: scaleDimension(15),
     borderTopWidth: 1,
@@ -491,6 +492,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: scaleDimension(70),
     height: "100%",
+  },
+  selectedAddressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: scaleDimension(15),
+    paddingVertical: scaleDimension(10),
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  locationIcon: {
+    marginRight: scaleDimension(10),
+  },
+  addressDetails: {
+    flex: 1,
+  },
+  addressText: {
+    fontSize: scaleFont(14),
+    color: "#333",
+  },
+  phoneText: {
+    fontSize: scaleFont(12),
+    color: "#666",
   },
 });
 

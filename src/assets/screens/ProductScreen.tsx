@@ -10,6 +10,8 @@ import {
   Alert,
   Animated,
   Easing,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -268,39 +270,39 @@ const Product = () => {
       Animated.parallel([
         Animated.timing(flyAnimX, {
           toValue: cartIconPosition.x - addToCartButtonPosition.x + scaleDimension(10),
-          duration: 3000,
+          duration: 1200,
           easing: Easing.out(Easing.exp),
           useNativeDriver: true,
         }),
         Animated.sequence([
           Animated.timing(flyAnimY, {
             toValue: cartIconPosition.y - addToCartButtonPosition.y - scaleDimension(50),
-            duration: 1500,
+            duration: 600,
             easing: Easing.out(Easing.exp),
             useNativeDriver: true,
           }),
           Animated.timing(flyAnimY, {
             toValue: cartIconPosition.y - addToCartButtonPosition.y + scaleDimension(5),
-            duration: 1500,
+            duration: 600,
             easing: Easing.in(Easing.exp),
             useNativeDriver: true,
           }),
         ]),
         Animated.timing(scaleAnim, {
           toValue: 0.5,
-          duration: 3000,
+          duration: 1200,
           easing: Easing.linear,
           useNativeDriver: true,
         }),
         Animated.timing(opacityAnim, {
           toValue: 0.5,
-          duration: 3000,
+          duration: 1200,
           easing: Easing.out(Easing.exp),
           useNativeDriver: true,
         }),
         Animated.timing(cartGrowAnim, {
           toValue: 1.5,
-          duration: 3000,
+          duration: 1200,
           easing: Easing.linear,
           useNativeDriver: true,
         }),
@@ -336,24 +338,28 @@ const Product = () => {
         <TouchableOpacity
           onPress={() => navigation.navigate("CartScreen")}
           ref={cartIconRef}
-          style={styles.cartIconContainer}
+          style={styles.cartIconContainer as StyleProp<ViewStyle>}
         >
           <Animated.View
-            style={{
-              transform: [{ scale: cartGrowAnim }],
-            }}
+            style={
+              {
+                transform: [{ scale: cartGrowAnim }],
+              } as StyleProp<ViewStyle>
+            }
           >
             <Ionicons name="bag-outline" size={scaleFont(24)} color="#FFFFFF" />
           </Animated.View>
         </TouchableOpacity>
       </View>
       <Animated.View
-        style={[
-          styles.modalContent,
-          {
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
+        style={
+          [
+            styles.modalContent,
+            {
+              transform: [{ translateY: slideAnim }],
+            },
+          ] as StyleProp<ViewStyle>
+        }
       >
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle}>{cleanText(product.title)}</Text>
@@ -379,10 +385,12 @@ const Product = () => {
             <Text style={styles.sizeLabel}>Size: </Text>
             <View style={styles.sizeButtons}>
               <TouchableOpacity
-                style={[
-                  styles.sizeButton,
-                  selectedSize === "S" && styles.sizeButtonSelected,
-                ]}
+                style={
+                  [
+                    styles.sizeButton,
+                    selectedSize === "S" && styles.sizeButtonSelected,
+                  ] as StyleProp<ViewStyle>
+                }
                 onPress={() => setSelectedSize("S")}
               >
                 <Text
@@ -395,10 +403,12 @@ const Product = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.sizeButton,
-                  selectedSize === "M" && styles.sizeButtonSelected,
-                ]}
+                style={
+                  [
+                    styles.sizeButton,
+                    selectedSize === "M" && styles.sizeButtonSelected,
+                  ] as StyleProp<ViewStyle>
+                }
                 onPress={() => setSelectedSize("M")}
               >
                 <Text
@@ -411,10 +421,12 @@ const Product = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.sizeButton,
-                  selectedSize === "L" && styles.sizeButtonSelected,
-                ]}
+                style={
+                  [
+                    styles.sizeButton,
+                    selectedSize === "L" && styles.sizeButtonSelected,
+                  ] as StyleProp<ViewStyle>
+                }
                 onPress={() => setSelectedSize("L")}
               >
                 <Text
@@ -429,7 +441,7 @@ const Product = () => {
             </View>
           </View>
           <TouchableOpacity
-            style={styles.favoriteButton}
+            style={styles.favoriteButton as StyleProp<ViewStyle>}
             onPress={handleFavoriteToggle}
           >
             <Text style={styles.favoriteText}>Favorite</Text>
@@ -447,7 +459,7 @@ const Product = () => {
           <View style={styles.quantityContainer}>
             <TouchableOpacity
               onPress={() => setQuantity(Math.max(1, quantity - 1))}
-              style={styles.quantityButton}
+              style={styles.quantityButton as StyleProp<ViewStyle>}
               activeOpacity={0.7}
             >
               <Text style={styles.quantityText}>-</Text>
@@ -455,7 +467,7 @@ const Product = () => {
             <Text style={styles.quantity}>{quantity}</Text>
             <TouchableOpacity
               onPress={() => setQuantity(quantity + 1)}
-              style={styles.quantityButton}
+              style={styles.quantityButton as StyleProp<ViewStyle>}
               activeOpacity={0.7}
             >
               <Text style={styles.quantityText}>+</Text>
@@ -463,7 +475,7 @@ const Product = () => {
           </View>
         </View>
         <TouchableOpacity
-          style={styles.addToCartButton}
+          style={styles.addToCartButton as StyleProp<ViewStyle>}
           onPress={handleAddToCart}
           ref={addToCartButtonRef}
         >
@@ -474,19 +486,21 @@ const Product = () => {
 
       {showFlyingImage && (
         <Animated.View
-          style={[
-            styles.flyingImageContainer,
-            {
-              transform: [
-                { translateX: flyAnimX },
-                { translateY: flyAnimY },
-                { scale: scaleAnim },
-              ],
-              opacity: opacityAnim,
-              left: addToCartButtonPosition.x - scaleDimension(20),
-              top: addToCartButtonPosition.y - scaleDimension(20),
-            },
-          ]}
+          style={
+            [
+              styles.flyingImageContainer,
+              {
+                transform: [
+                  { translateX: flyAnimX },
+                  { translateY: flyAnimY },
+                  { scale: scaleAnim },
+                ],
+                opacity: opacityAnim,
+                left: addToCartButtonPosition.x - scaleDimension(20),
+                top: addToCartButtonPosition.y - scaleDimension(20),
+              },
+            ] as StyleProp<ViewStyle>
+          }
         >
           <Image
             source={{ uri: product.image }}

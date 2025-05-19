@@ -21,6 +21,8 @@ import LawAndPolicyScreen from "../components/LawAndPolicy";
 import OrderSuccessScreen from "../components/OrderSuccessScreen";
 import OrderHistoryScreen from "../components/OrderHistoryScreen";
 import EditAddressScreen from "../context/EditAddressScreen";
+import VerificationCode from "../screens/VerificationCode";
+import AddressSelectionScreen from "../screens/AddressSelectionScreen";
 
 export type RootStackParamList = {
   Introduce: undefined;
@@ -43,6 +45,7 @@ export type RootStackParamList = {
   OrderSuccess: undefined;
   OrderHistory: undefined;
   EditAddress: undefined;
+  AddressSelection: undefined; // Added this line
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -94,7 +97,8 @@ const Router = () => {
               <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
               <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
               <Stack.Screen name="EditAddress" component={EditAddressScreen} />
-          
+              <Stack.Screen name="VerificationCode" component={VerificationCode} />
+              <Stack.Screen name="AddressSelection" component={AddressSelectionScreen} />
             </Stack.Navigator>
             </NavigationContainer>
             </FavoritesProvider>

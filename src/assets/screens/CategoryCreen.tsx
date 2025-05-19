@@ -10,13 +10,29 @@ interface CategoryItem {
 
 const categories: CategoryItem[] = [
 	{
-		id: "1",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/category1.png",
+		"id": "1",
+		"image": "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/category1.png"
 	},
 	{
-		id: "2",
-		image: "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome3.jpg",
+		"id": "2",
+		"image": "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome3.jpg"
 	},
+	{
+		"id": "3",
+		"image": "https://fra.cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/682a0df60022134ab139/view?project=67ed5f5e00176f489872&mode=admin"
+	},
+	{
+		"id": "4",
+		"image": "https://fra.cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/682a0e30000781b19ff0/view?project=67ed5f5e00176f489872&mode=admin"
+	},
+	{
+		"id": "5",
+		"image": "https://fra.cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/682a0e4a003b0791cf47/view?project=67ed5f5e00176f489872&mode=admin"
+	},
+	{
+		"id": "6",
+		"image": "https://raw.githubusercontent.com/mark2004hd/img-api/master/img/introhome1.jpg"
+	}
 	
 ];
 

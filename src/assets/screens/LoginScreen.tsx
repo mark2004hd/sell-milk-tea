@@ -78,28 +78,14 @@ export default function Login({ navigation }: LoginProps) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        console.log("Phiên đăng nhập được tìm thấy khi tải ứng dụng:", session);
+       
         navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
       } else {
         console.log("Không tìm thấy phiên đăng nhập khi tải ứng dụng.");
       }
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Trạng thái xác thực thay đổi:", event, session);
-      setSession(session);
-      if (event === "SIGNED_IN" && session) {
-        console.log("Người dùng đăng nhập thành công:", session);
-        navigation.replace("MainTabs"); // Sửa từ HomeScreen thành MainTabs
-      } else if (event === "SIGNED_OUT") {
-        console.log("Người dùng đã đăng xuất.");
-      } else {
-        console.log("Sự kiện xác thực khác:", event);
-      }
-    });
-
+    
     const handleAppStateChange = async (nextAppState: string) => {
       if (nextAppState === "active") {
         const { data: { session } } = await supabase.auth.getSession();
@@ -112,7 +98,7 @@ export default function Login({ navigation }: LoginProps) {
     const appStateSubscription = AppState.addEventListener("change", handleAppStateChange);
 
     return () => {
-      subscription?.unsubscribe();
+     
       appStateSubscription.remove();
     };
   }, [navigation]);

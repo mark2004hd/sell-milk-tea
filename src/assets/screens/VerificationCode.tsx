@@ -1,179 +1,199 @@
-import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useRef, useState } from "react";
-import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import verificationCodeStyle from "../style/styleVerification";
+import { NavigationProp } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import Modal from 'react-native-modal';
 
-type RootStackParamList = {
-	Signup: undefined;
-	VerificationCode: undefined;
+const VerificationScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [buttonScale] = useState(new Animated.Value(1));
+
+  // Tự động mở modal khi màn hình được render
+  useEffect(() => {
+    setModalVisible(true);
+  }, []);
+
+  // Hiệu ứng zoom out cho nút Login khi nhấn
+  const handlePressIn = () => {
+    Animated.spring(buttonScale, {
+      toValue: 0.95,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(buttonScale, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+      navigation.navigate('Login');
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backArrow}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Verify</Text>
+      </View>
+
+      {/* Modal Popup */}
+      <Modal
+        isVisible={isModalVisible}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        backdropOpacity={0.3}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          {/* Verification Icon */}
+          <View style={styles.iconContainer}>
+            <Image
+              source={{ uri: 'https://fra.cloud.appwrite.io/v1/storage/buckets/67ed61c3001dff3f41f1/files/682a21e6001a5546d6cd/view?project=67ed5f5e00176f489872&mode=admin' }}
+              style={styles.icon}
+            />
+          </View>
+          <Text style={styles.verificationText}>Regitered Successfully</Text>
+
+          {/* Success Section */}
+          <View style={styles.successContainer}>
+            <Animatable.View
+              animation="bounceIn"
+              duration={1000}
+              style={styles.checkmarkContainer}
+            >
+              <Text style={styles.checkmark}>✓</Text>
+            </Animatable.View>
+            <Text style={styles.successText}>Successful</Text>
+            <Text style={styles.congratsText}>
+              Congratulations, your account has been created.
+            </Text>
+            <Text style={styles.loginPrompt}>
+              Please login to receive more discount information.
+            </Text>
+          </View>
+
+          {/* Login Button với hiệu ứng zoom out */}
+          <TouchableOpacity
+            activeOpacity={1}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+          >
+            <Animated.View style={[styles.loginButton, { transform: [{ scale: buttonScale }] }]}>
+              <Text style={styles.loginButtonText}>Login</Text>
+            </Animated.View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </View>
+  );
 };
 
-type VerificationCodeScreenNavigationProp = StackNavigationProp<RootStackParamList, "VerificationCode">;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  backArrow: {
+    fontSize: 24,
+    color: '#1E90FF',
+    marginRight: 16,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    height: '70%',
+  },
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#D3C8A6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+  },
+  verificationText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  successContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  checkmarkContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#32CD32',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  checkmark: {
+    fontSize: 40,
+    color: '#fff',
+  },
+  successText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  congratsText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  loginPrompt: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+  },
+  loginButton: {
+    backgroundColor: '#8B5A2B',
+    paddingVertical: 20,
+    paddingHorizontal: 100,
+    borderRadius: 30,
+    marginTop: 30,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
-interface VerificationCodeProps {
-	navigation: VerificationCodeScreenNavigationProp;
-}
-
-export default function VerificationCode({ navigation }: VerificationCodeProps) {
-	// Tạo refs cho từng TextInput
-	const input1Ref = useRef<TextInput>(null);
-	const input2Ref = useRef<TextInput>(null);
-	const input3Ref = useRef<TextInput>(null);
-	const input4Ref = useRef<TextInput>(null);
-	const input5Ref = useRef<TextInput>(null);
-
-	// Tạo state để quản lý giá trị của từng ô
-	const [code1, setCode1] = useState("");
-	const [code2, setCode2] = useState("");
-	const [code3, setCode3] = useState("");
-	const [code4, setCode4] = useState("");
-	const [code5, setCode5] = useState("");
-
-	return (
-		<SafeAreaView style={verificationCodeStyle.safeArea}>
-			<ScrollView style={verificationCodeStyle.scrollView}>
-				<View style={verificationCodeStyle.headerContainer}>
-					<View style={verificationCodeStyle.headerRow}>
-						<TouchableOpacity onPress={() => navigation.goBack()}>
-							<Icon name="arrow-left" size={20} color="#191D31" />
-						</TouchableOpacity>
-						<View style={{ flex: 1, alignItems: "center" }}>
-							<Text style={verificationCodeStyle.headerText}>
-								Verification
-							</Text>
-						</View>
-					</View>
-					<View style={verificationCodeStyle.divider}></View>
-				</View>
-
-				<Image
-					source={{
-						uri: "https://raw.githubusercontent.com/mark2004dev/img-api/master/img/Illustration.png",
-					}}
-					resizeMode="stretch"
-					style={verificationCodeStyle.verificationImage}
-				/>
-
-				<Text style={verificationCodeStyle.titleText}>Verification code</Text>
-
-				<Text style={verificationCodeStyle.infoText}>
-					We sent the information and verification code{"\n"}
-					to someone's specified email address{"\n"}
-				</Text>
-				<Text style={verificationCodeStyle.mailText}>hawanzhjiangmian@mianmain.com</Text>
-
-				<View style={verificationCodeStyle.codeContainer}>
-					<View style={verificationCodeStyle.codeButton}>
-						<TextInput
-							ref={input1Ref}
-							style={verificationCodeStyle.codeText}
-							value={code1}
-							onChangeText={(text) => {
-								setCode1(text);
-								if (text.length === 1) input2Ref.current?.focus();
-							}}
-							textAlign="center"
-							keyboardType="numeric"
-							maxLength={1}
-							returnKeyType="next"
-							onSubmitEditing={() => input2Ref.current?.focus()}
-						/>
-					</View>
-					<View style={verificationCodeStyle.codeButton}>
-						<TextInput
-							ref={input2Ref}
-							style={verificationCodeStyle.codeText}
-							value={code2}
-							onChangeText={(text) => {
-								setCode2(text);
-								if (text.length === 1) {
-									input3Ref.current?.focus();
-								} else if (text === "" && code1 !== "") {
-									input1Ref.current?.focus();
-								}
-							}}
-							textAlign="center"
-							keyboardType="numeric"
-							maxLength={1}
-							returnKeyType="next"
-							onSubmitEditing={() => input3Ref.current?.focus()}
-						/>
-					</View>
-					<View style={verificationCodeStyle.codeButton}>
-						<TextInput
-							ref={input3Ref}
-							style={verificationCodeStyle.codeText}
-							value={code3}
-							onChangeText={(text) => {
-								setCode3(text);
-								if (text.length === 1) {
-									input4Ref.current?.focus();
-								} else if (text === "" && code2 !== "") {
-									input2Ref.current?.focus();
-								}
-							}}
-							textAlign="center"
-							keyboardType="numeric"
-							maxLength={1}
-							returnKeyType="next"
-							onSubmitEditing={() => input4Ref.current?.focus()}
-						/>
-					</View>
-					<View style={verificationCodeStyle.codeButton}>
-						<TextInput
-							ref={input4Ref}
-							style={verificationCodeStyle.codeText}
-							value={code4}
-							onChangeText={(text) => {
-								setCode4(text);
-								if (text.length === 1) {
-									input5Ref.current?.focus();
-								} else if (text === "" && code3 !== "") {
-									input3Ref.current?.focus();
-								}
-							}}
-							textAlign="center"
-							keyboardType="numeric"
-							maxLength={1}
-							returnKeyType="next"
-							onSubmitEditing={() => input5Ref.current?.focus()}
-						/>
-					</View>
-					<View style={verificationCodeStyle.emptyCodeBox}>
-						<TextInput
-							ref={input5Ref}
-							style={verificationCodeStyle.codeText}
-							value={code5}
-							onChangeText={(text) => {
-								setCode5(text);
-								if (text === "" && code4 !== "") {
-									input4Ref.current?.focus();
-								}
-							}}
-							textAlign="center"
-							keyboardType="numeric"
-							maxLength={1}
-							returnKeyType="done"
-							onSubmitEditing={() => input5Ref.current?.blur()}
-						/>
-					</View>
-				</View>
-
-				<TouchableOpacity
-					style={verificationCodeStyle.confirmButton}
-					onPress={() => alert(`Code: ${code1}${code2}${code3}${code4}${code5}`)}>
-					<Text style={verificationCodeStyle.confirmText}>Confirm</Text>
-				</TouchableOpacity>
-				<TouchableOpacity>
-					<View style={{ flexDirection: "row", justifyContent: "center" }}>
-						<Text style={verificationCodeStyle.retryText}>
-							Can't receive the authentication code?
-						</Text>
-						<Text style={verificationCodeStyle.retry}> Retry</Text>
-					</View>
-				</TouchableOpacity>
-			</ScrollView>
-		</SafeAreaView>
-	);
-}
+export default VerificationScreen;

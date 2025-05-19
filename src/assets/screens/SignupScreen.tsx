@@ -64,14 +64,14 @@ export default function Signup({ navigation }: LoginProps) {
 			const data = await response.json();
 
 			if (response.ok) {
-				Alert.alert("Success", "Signup successful!");
-				navigation.navigate("Login");
+				
+				navigation.navigate("VerificationCode");
 				
 			} else {
 				Alert.alert("Signup failed", data.message || "Unknown error");
 			}
 		} catch (error) {
-			console.error("Signup error:", error);
+			
 			Alert.alert("Error", "Something went wrong.");
 		}
 	};
